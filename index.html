@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Иерархия разделов сайта</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 8px solid #3498db;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+        }
+
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
+        }
+
+        .btn-expand-all {
+            background: #2ecc71;
+        }
+
+        .btn-expand-all:hover {
+            background: #27ae60;
+        }
+
+        .btn-collapse-all {
+            background: #e74c3c;
+        }
+
+        .btn-collapse-all:hover {
+            background: #c0392b;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .hierarchy-container {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .hierarchy-title {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hierarchy-title i {
+            color: #3498db;
+        }
+
+        .tree {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tree, .tree ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tree ul {
+            margin-left: 25px;
+            position: relative;
+        }
+
+        .tree ul:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .tree li {
+            margin: 10px 0;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .tree li:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top
+
+: 50%;
+            width: 20px;
+            height: 2px;
+            background: #e0e0e0;
+        }
+
+        .tree > li:first-child:before {
+            display: none;
+        }
+
+        .tree-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
+        }
+
+        .tree-item:hover {
+            background: #e8f4fc;
+            transform: translateX(5px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.08);
+        }
+
+        .tree-item.active {
+            background: #e1f5fe;
+            border-left-color: #2ecc71;
+        }
+
+        .item-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .item-path {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .item-icon {
+            color: #3498db;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .tree-item.collapsed .item-icon {
+            transform: rotate(-90deg);
+        }
+
+        .details-panel {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .details-title {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .details-title i {
+            color: #3498db;
+        }
+
+        .no-selection {
+            color: #7f8c8d;
+            font-style: italic;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .section-details {
+            display: none;
+        }
+
+        .section-details.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-icon {
+            width: 60px;
+            height: 60px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .detail-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+
+        .detail-path {
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .detail-content {
+            margin-top: 25px;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .detail-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+
+        .detail-section h3 i {
+            color: #3498db;
+        }
+
+        .subsections-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .subsections-list li {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+
+gap: 10px;
+            transition: all 0.2s ease;
+            border-left: 3px solid #3498db;
+        }
+
+        .subsections-list li:hover {
+            background: #e8f4fc;
+            transform: translateX(5px);
+        }
+
+        .subsections-list li i {
+            color: #3498db;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            .hierarchy-container, .details-panel {
+                min-width: 100%;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: #7f8c8d;
+        }
+
+        .breadcrumb i {
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-sitemap"></i> Иерархия разделов сайта</h1>
+            <p class="subtitle">Интерактивное представление структуры веб-сайта с возможностью навигации по разделам</p>
+            
+            <div class="controls">
+                <button class="btn btn-expand-all" id="expandAll">
+                    <i class="fas fa-expand-alt"></i> Раскрыть все
+                </button>
+                <button class="btn btn-collapse-all" id="collapseAll">
+                    <i class="fas fa-compress-alt"></i> Свернуть все
+                </button>
+                <button class="btn" id="resetView">
+                    <i class="fas fa-redo"></i> Сбросить вид
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="hierarchy-container">
+                <h2 class="hierarchy-title"><i class="fas fa-project-diagram"></i> Дерево разделов</h2>
+                <div class="breadcrumb" id="breadcrumb">
+                    <a href="#" data-path="/">Главная</a>
+                </div>
+                <ul class="tree" id="tree"></ul>
+            </div>
+
+            <div class="details-panel">
+                <h2 class="details-title"><i class="fas fa-info-circle"></i> Детали раздела</h2>
+                <div class="no-selection" id="noSelection">
+                    <i class="fas fa-mouse-pointer fa-3x" style="color: #bdc3c7; margin-bottom: 20px;"></i>
+                    <h3>Выберите раздел для просмотра деталей</h3>
+                    <p>Кликните на любой раздел в дереве слева, чтобы увидеть подробную информацию о нем</p>
+                </div>
+                <div id="detailsContent"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Иерархия разделов сайта &copy; 2023 | Всего разделов: <span id="totalSections">0</span></p>
+            <p>Используйте клик для навигации, двойной клик для раскрытия/сворачивания подразделов</p>
+        </div>
+    </div>
+
+    <script>
+        // Данные иерархии разделов
+        const hierarchyData = {
+            id: "root",
+            title: "Главная страница",
+            path: "/",
+            description: "Основная страница сайта, точка входа для всех пользователей",
+            content: "Добро пожаловать на главную страницу нашего сайта. Отсюда вы можете получить доступ ко всем основным разделам.",
+            icon: "fas fa-home",
+            color: "#3498db",
+            children: [
+                {
+                    id: "about",
+                    title: "О компании",
+                    path: "/about",
+                    description: "Раздел с информацией о компании, её истории и миссии",
+                    content: "Наша компания была основана в 2010 году и с тех пор успешно развивается на рынке IT-услуг.",
+                    icon: "fas fa-building",
+                    color: "#2ecc71",
+                    children: [
+                        {
+                            id: "history",
+                            title: "История",
+                            path: "/about/history",
+                            description: "История развития компании с момента основания",
+                            content: "Основание компании, ключевые вехи развития, достижения и награды.",
+                            icon: "fas fa-history",
+                            color: "#9b59b6"
+                        },
+                        {
+                            id: "team",
+                            title: "Команда",
+                            path: "/about/team",
+                            description: "Знакомство с нашей командой специалистов",
+                            content: "В нашей компании работают высококвалифицированные специалисты с опытом работы более 5 лет.",
+                            icon: "fas fa-users",
+                            color: "#e74c3c",
+                            children: [
+                                {
+                                    id: "management",
+                                    title: "Руководство",
+                                    path: "/about/team/management",
+                                    description: "Руководящий состав компании",
+                                    content: "Опытные руководители с многолетним опытом в управлении IT-проектами.",
+                                    icon: "fas fa-user-tie",
+                                    color: "#f39c12"
+                                },
+                                {
+                                    id: "developers",
+                                    title: "Разработчики",
+                                    path: "/about/team/developers",
+                                    description: "Команда разработчиков",
+                                    content: "Профессиональные разработчики, специализирующиеся на различных технологиях.",
+                                    icon: "fas fa-code",
+                                    color: "#1abc9c"
+                                },
+                                {
+                                    id: "designers",
+                                    title: "Дизайнеры",
+                                    path: "/about/team/designers",
+                                    description: "Команда дизайнеров",
+                                    content: "Креативные дизайнеры, создающие удобные и красивые интерфейсы.",
+                                    icon: "fas fa-paint-brush",
+                                    color: "#d35400"
+                                }
+                            ]
+                        },
+                        {
+                            id: "mission",
+                            title: "Миссия и ценности",
+                            path: "/about/mission",
+                            description: "Миссия компании и корпоративные ценности",
+                            content: "Наша миссия - создавать качественные IT-решения, которые делают жизнь людей проще и удобнее.",
+                            icon: "fas fa-bullseye",
+                            color: "#34495e"
+                        }
+                    ]
+                },
+                {
+                    id: "services",
+                    title: "Услуги",
+                    path: "/services",
+                    description: "Перечень предоставляемых услуг и сервисов",
+                    content: "Мы предлагаем широкий спектр услуг в области веб-разработки, дизайна и цифрового маркетинга.",
+                    icon: "fas fa-concierge-bell",
+                    color: "#e67e22",
+                    children: [
+                        {
+                            id: "webdev",
+                            title: "Веб-разработка",
+                            path: "/services/web-development",
+                            description: "Создание веб-сайтов и веб-приложений",
+                            content: "Полный цикл разработки: от проектирования до запуска и поддержки.",
+                            icon: "fas fa-laptop-code",
+                            color: "#3498db"
+                        },
+                        {
+                            id: "mobile",
+                            title: "Мобильные приложения",
+                            path: "/services/mobile-apps",
+                            description: "Разработка приложений для iOS и Android",
+                            content: "Создание нативных и кроссплатформенных мобильных приложений.",
+                            icon: "fas fa-mobile-alt",
+                            color: "#9b59b6"
+                        },
+                        {
+                            id: "design",
+                            title: "Дизайн",
+                            path: "/services/design",
+                            description: "Дизайн интерфейсов и фирменного стиля",
+                            content: "Создание уникального дизайна, который выделит ваш бренд среди конкурентов.",
+                            icon: "fas fa-palette",
+                            color: "#e74c3c"
+                        },
+                        {
+                            id: "seo",
+                            title: "SEO-оптимизация",
+                            path: "/services/seo",
+                            description: "Поисковая оптимизация и продвижение",
+                            content: "Увеличение видимости вашего сайта в поисковых системах.",
+                            icon: "fas fa-search",
+                            color: "#2ecc71"
+                        }
+                    ]
+                },
+                {
+                    id: "portfolio",
+                    title: "Портфолио",
+                    path: "/portfolio",
+                    description: "Примеры выполненных работ и проектов",
+                    content: "В нашем портфолио представлены проекты различной сложности для клиентов из разных отраслей.",
+                    icon: "fas fa-briefcase",
+                    color: "#1abc9c",
+                    children: [
+                        {
+                            id: "websites",
+                            title: "Веб-сайты",
+                            path: "/portfolio/websites",
+                            description: "Примеры созданных веб-сайтов",
+                            content: "Корпоративные сайты, интернет-магазины, лендинги и порталы.",
+                            icon: "fas fa-globe",
+                            color: "#3498db"
+                        },
+                        {
+                            id: "applications",
+                            title: "Приложения",
+                            path: "/portfolio/applications",
+                            description: "Примеры разработанных приложений",
+                            content: "Мобильные и десктопные приложения для бизнеса и потребителей.",
+                            icon: "fas fa-mobile",
+                            color: "#9b59b6"
+                        }
+                    ]
+                },
+                {
+                    id: "blog",
+                    title: "Блог",
+                    path: "/blog",
+                    description: "Статьи и новости компании",
+                    content: "Актуальные статьи о технологиях, дизайне и маркетинге.",
+                    icon: "fas fa-blog",
+                    color: "#f39c12"
+                },
+                {
+id: "contacts",
+                    title: "Контакты",
+                    path: "/contacts",
+                    description: "Контактная информация и форма обратной связи",
+                    content: "Свяжитесь с нами любым удобным способом. Мы всегда рады новым проектам и сотрудничеству.",
+                    icon: "fas fa-address-book",
+                    color: "#e74c3c",
+                    children: [
+                        {
+                            id: "feedback",
+                            title: "Обратная связь",
+                            path: "/contacts/feedback",
+                            description: "Форма для отправки сообщений",
+                            content: "Задайте вопрос или отправьте предложение о сотрудничестве.",
+                            icon: "fas fa-comments",
+                            color: "#3498db"
+                        },
+                        {
+                            id: "offices",
+                            title: "Наши офисы",
+                            path: "/contacts/offices",
+                            description: "Адреса офисов и филиалов",
+                            content: "Мы имеем представительства в нескольких городах страны.",
+                            icon: "fas fa-map-marker-alt",
+                            color: "#2ecc71"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Состояние приложения
+        let appState = {
+            expandedNodes: new Set(['root']),
+            selectedNode: null,
+            breadcrumbPath: []
+        };
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTree();
+            updateTotalSections();
+            
+            // Обработчики кнопок
+            document.getElementById('expandAll').addEventListener('click', expandAll);
+            document.getElementById('collapseAll').addEventListener('click', collapseAll);
+            document.getElementById('resetView').addEventListener('click', resetView);
+            
+            // Изначально выбираем корневой элемент
+            selectNode('root');
+        });
+
+        // Рендеринг дерева
+        function renderTree() {
+            const treeContainer = document.getElementById('tree');
+            treeContainer.innerHTML = '';
+            treeContainer.appendChild(createTreeNode(hierarchyData, 0));
+        }
+
+        // Создание узла дерева
+        function createTreeNode(node, level) {
+            const li = document.createElement('li');
+            li.id = `node-${node.id}`;
+            li.dataset.nodeId = node.id;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'tree-item';
+            if (appState.selectedNode === node.id) {
+                itemDiv.classList.add('active');
+            }
+            
+            if (node.children && node.children.length > 0) {
+                itemDiv.classList.add(appState.expandedNodes.has(node.id) ? 'expanded' : 'collapsed');
+            }
+            
+            // Содержимое элемента
+            itemDiv.innerHTML = `
+                <div>
+                    <div class="item-title"><i class="${node.icon}" style="color: ${node.color}; margin-right: 8px;"></i> ${node.title}</div>
+                    <div class="item-path">${node.path}</div>
+                </div>
+                ${node.children && node.children.length > 0 ? 
+                    `<div class="item-icon"><i class="fas fa-chevron-down"></i></div>` : 
+                    `<div class="item-icon"><i class="fas fa-file"></i></div>`
+                }
+            `;
+            
+            // Обработчики событий
+            itemDiv.addEventListener('click', function(e) {
+                e.stopPropagation();
+                selectNode(node.id);
+            });
+            
+            itemDiv.addEventListener('dblclick', function(e) {
+                e.stopPropagation();
+                toggleNode(node.id);
+            });
+            
+            li.appendChild(itemDiv);
+
+
+// Дочерние элементы
+            if (node.children && node.children.length > 0) {
+                const ul = document.createElement('ul');
+                ul.style.display = appState.expandedNodes.has(node.id) ? 'block' : 'none';
+                
+                node.children.forEach(child => {
+                    ul.appendChild(createTreeNode(child, level + 1));
+                });
+                
+                li.appendChild(ul);
+            }
+            
+            return li;
+        }
+
+        // Выбор узла
+        function selectNode(nodeId) {
+            appState.selectedNode = nodeId;
+            
+            // Обновление классов активных элементов
+            document.querySelectorAll('.tree-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const selectedItem = document.querySelector(`#node-${nodeId} .tree-item`);
+            if (selectedItem) {
+                selectedItem.classList.add('active');
+            }
+            
+            // Обновление деталей
+            updateDetails(nodeId);
+            
+            // Обновление хлебных крошек
+            updateBreadcrumb(nodeId);
+        }
+
+        // Переключение узла (раскрыть/свернуть)
+        function toggleNode(nodeId) {
+            if (appState.expandedNodes.has(nodeId)) {
+                appState.expandedNodes.delete(nodeId);
+            } else {
+                appState.expandedNodes.add(nodeId);
+            }
+            
+            const nodeElement = document.getElementById(`node-${nodeId}`);
+            if (nodeElement) {
+                const itemDiv = nodeElement.querySelector('.tree-item');
+                const childUl = nodeElement.querySelector('ul');
+                
+                if (itemDiv) {
+                    itemDiv.classList.toggle('expanded');
+                    itemDiv.classList.toggle('collapsed');
+                }
+                
+                if (childUl) {
+                    childUl.style.display = appState.expandedNodes.has(nodeId) ? 'block' : 'none';
+                }
+            }
+        }
+
+        // Раскрыть все узлы
+        function expandAll() {
+            // Собираем все ID узлов, у которых есть дети
+            const nodesWithChildren = [];
+            function collectNodes(node) {
+                if (node.children && node.children.length > 0) {
+                    nodesWithChildren.push(node.id);
+                    node.children.forEach(collectNodes);
+                }
+            }
+            collectNodes(hierarchyData);
+            
+            // Добавляем все узлы в expandedNodes
+            nodesWithChildren.forEach(id => appState.expandedNodes.add(id));
+            
+            // Перерендериваем дерево
+            renderTree();
+        }
+
+        // Свернуть все узлы
+        function collapseAll() {
+            // Оставляем только корневой элемент
+            appState.expandedNodes.clear();
+            appState.expandedNodes.add('root');
+            
+            // Перерендериваем дерево
+            renderTree();
+        }
+
+        // Сброс вида
+        function resetView() {
+            collapseAll();
+            selectNode('root');
+        }
+
+        // Обновление деталей выбранного узла
+        function updateDetails(nodeId) {
+            const node = findNodeById(hierarchyData, nodeId);
+            const detailsContent = document.getElementById('detailsContent');
+            const noSelection = document.getElementById('noSelection');
+            
+            if (!node) return;
+            
+            noSelection.style.display = 'none';
+            detailsContent.innerHTML = createDetailsHTML(node);
+        }
+
+        // Создание HTML для деталей узла
+        function createDetailsHTML(node) {
+            const subsections = node.children && node.children.length > 0 ? 
+                node.children.map(child => `
+                    <li>
+                        <i class="${child.icon}" style="color: ${child.color};"></i>
+                        <strong>${child.title}</strong> - ${child.description}
+
+
+<span style="color: #95a5a6; font-size: 0.9em; margin-left: auto;">${child.path}</span>
+                    </li>
+                `).join('') : 
+                '<li style="font-style: italic; color: #95a5a6;">Нет подразделов</li>';
+            
+            return `
+                <div class="section-details active">
+                    <div class="detail-header">
+                        <div class="detail-icon" style="background: ${node.color};">
+                            <i class="${node.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="detail-title">${node.title}</div>
+                            <div class="detail-path">${node.path}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-content">
+                        <div class="detail-section">
+                            <h3><i class="fas fa-info-circle"></i> Описание</h3>
+                            <p>${node.description}</p>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3><i class="fas fa-file-alt"></i> Содержание</h3>
+                            <p>${node.content}</p>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3><i class="fas fa-folder-open"></i> Подразделы (${node.children ? node.children.length : 0})</h3>
+                            <ul class="subsections-list">
+                                ${subsections}
+                            </ul>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3><i class="fas fa-code-branch"></i> Иерархическая информация</h3>
+                            <p><strong>ID:</strong> ${node.id}</p>
+                            <p><strong>Уровень вложенности:</strong> ${calculateNodeDepth(node)}</p>
+                            <p><strong>Всего потомков:</strong> ${countDescendants(node)}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Обновление хлебных крошек
+        function updateBreadcrumb(nodeId) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            const path = getNodePath(nodeId);
+            
+            let breadcrumbHTML = '';
+            path.forEach((node, index) => {
+                if (index > 0) {
+                    breadcrumbHTML += `<i class="fas fa-chevron-right"></i>`;
+                }
+                
+                if (index === path.length - 1) {
+                    breadcrumbHTML += `<span>${node.title}</span>`;
+                } else {
+                    breadcrumbHTML += `<a href="#" data-path="${node.path}" data-node-id="${node.id}">${node.title}</a>`;
+                }
+            });
+            
+            breadcrumb.innerHTML = breadcrumbHTML;
+            
+            // Добавляем обработчики для ссылок в хлебных крошках
+            breadcrumb.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const nodeId = this.dataset.nodeId;
+                    selectNode(nodeId);
+                    
+                    // Раскрываем все родительские узлы
+                    let currentNode = findNodeById(hierarchyData, nodeId);
+                    while (currentNode && currentNode.parentId) {
+                        appState.expandedNodes.add(currentNode.parentId);
+                        currentNode = findNodeById(hierarchyData, currentNode.parentId);
+                    }
+                    
+                    renderTree();
+                });
+            });
+        }
+
+        // Обновление счетчика разделов
+        function updateTotalSections() {
+            const total = countAllNodes(hierarchyData);
+            document.getElementById('totalSections').textContent =
+
+
+total;
+        }
+
+        // Вспомогательные функции
+        function findNodeById(node, id) {
+            if (node.id === id) return node;
+            
+            if (node.children) {
+                for (const child of node.children) {
+                    // Добавляем parentId для навигации
+                    child.parentId = node.id;
+                    const found = findNodeById(child, id);
+                    if (found) return found;
+                }
+            }
+            
+            return null;
+        }
+
+        function getNodePath(nodeId) {
+            const path = [];
+            let currentNode = findNodeById(hierarchyData, nodeId);
+            
+            while (currentNode) {
+                path.unshift(currentNode);
+                currentNode = currentNode.parentId ? findNodeById(hierarchyData, currentNode.parentId) : null;
+            }
+            
+            return path;
+        }
+
+        function calculateNodeDepth(node) {
+            let depth = 0;
+            let currentNode = node;
+            
+            while (currentNode.parentId) {
+                depth++;
+                currentNode = findNodeById(hierarchyData, currentNode.parentId);
+            }
+            
+            return depth;
+        }
+
+        function countDescendants(node) {
+            let count = 0;
+            
+            function countChildren(n) {
+                if (n.children) {
+                    count += n.children.length;
+                    n.children.forEach(countChildren);
+                }
+            }
+            
+            countChildren(node);
+            return count;
+        }
+
+        function countAllNodes(node) {
+            let count = 1; // Текущий узел
+            
+            if (node.children) {
+                node.children.forEach(child => {
+                    count += countAllNodes(child);
+                });
+            }
+            
+            return count;
+        }
+    </script>
+</body>
+</html>
