@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,7 +136,8 @@
             padding-left: 0;
         }
 
-        .tree, .tree ul {
+        .tree,
+        .tree ul {
             list-style: none;
             margin: 0;
             padding: 0;
@@ -166,15 +168,13 @@
             content: "";
             position: absolute;
             left: 0;
-            top
-
-: 50%;
+            top: 50%;
             width: 20px;
             height: 2px;
             background: #e0e0e0;
         }
 
-        .tree > li:first-child:before {
+        .tree>li:first-child:before {
             display: none;
         }
 
@@ -188,13 +188,13 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border-left: 4px solid #3498db;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05);
         }
 
         .tree-item:hover {
             background: #e8f4fc;
             transform: translateX(5px);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
         }
 
         .tree-item.active {
@@ -266,8 +266,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .detail-header {
@@ -341,8 +348,7 @@
             border-radius: 6px;
             display: flex;
             align-items: center;
-
-gap: 10px;
+            gap: 10px;
             transition: all 0.2s ease;
             border-left: 3px solid #3498db;
         }
@@ -368,20 +374,21 @@ gap: 10px;
             .content-wrapper {
                 flex-direction: column;
             }
-            
-            .hierarchy-container, .details-panel {
+
+            .hierarchy-container,
+            .details-panel {
                 min-width: 100%;
             }
-            
+
             h1 {
                 font-size: 2.2rem;
             }
-            
+
             .controls {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .btn {
                 width: 100%;
                 max-width: 300px;
@@ -420,12 +427,13 @@ gap: 10px;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
             <h1><i class="fas fa-sitemap"></i> Иерархия разделов сайта</h1>
             <p class="subtitle">Интерактивное представление структуры веб-сайта с возможностью навигации по разделам</p>
-            
+
             <div class="controls">
                 <button class="btn btn-expand-all" id="expandAll">
                     <i class="fas fa-expand-alt"></i> Раскрыть все
@@ -510,7 +518,18 @@ gap: 10px;
                                     description: "Руководящий состав компании",
                                     content: "Опытные руководители с многолетним опытом в управлении IT-проектами.",
                                     icon: "fas fa-user-tie",
-                                    color: "#f39c12"
+                                    color: "#f39c12",
+                                    children: [
+                                        {
+                                            id: "management1",
+                                            title: "Руководство1",
+                                            path: "/about/team/management/1",
+                                            description: "Руководящий состав компании",
+                                            content: "Опытные руководители с многолетним опытом в управлении IT-проектами.",
+                                            icon: "fas fa-user-tie",
+                                            color: "#f39c12"
+                                        }
+                                    ]
                                 },
                                 {
                                     id: "developers",
@@ -629,7 +648,7 @@ gap: 10px;
                     color: "#f39c12"
                 },
                 {
-id: "contacts",
+                    id: "contacts",
                     title: "Контакты",
                     path: "/contacts",
                     description: "Контактная информация и форма обратной связи",
@@ -668,15 +687,15 @@ id: "contacts",
         };
 
         // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             renderTree();
             updateTotalSections();
-            
+
             // Обработчики кнопок
             document.getElementById('expandAll').addEventListener('click', expandAll);
             document.getElementById('collapseAll').addEventListener('click', collapseAll);
             document.getElementById('resetView').addEventListener('click', resetView);
-            
+
             // Изначально выбираем корневой элемент
             selectNode('root');
         });
@@ -693,75 +712,75 @@ id: "contacts",
             const li = document.createElement('li');
             li.id = `node-${node.id}`;
             li.dataset.nodeId = node.id;
-            
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'tree-item';
             if (appState.selectedNode === node.id) {
                 itemDiv.classList.add('active');
             }
-            
+
             if (node.children && node.children.length > 0) {
                 itemDiv.classList.add(appState.expandedNodes.has(node.id) ? 'expanded' : 'collapsed');
             }
-            
+
             // Содержимое элемента
             itemDiv.innerHTML = `
                 <div>
                     <div class="item-title"><i class="${node.icon}" style="color: ${node.color}; margin-right: 8px;"></i> ${node.title}</div>
                     <div class="item-path">${node.path}</div>
                 </div>
-                ${node.children && node.children.length > 0 ? 
-                    `<div class="item-icon"><i class="fas fa-chevron-down"></i></div>` : 
+                ${node.children && node.children.length > 0 ?
+                    `<div class="item-icon"><i class="fas fa-chevron-down"></i></div>` :
                     `<div class="item-icon"><i class="fas fa-file"></i></div>`
                 }
             `;
-            
+
             // Обработчики событий
-            itemDiv.addEventListener('click', function(e) {
+            itemDiv.addEventListener('click', function (e) {
                 e.stopPropagation();
                 selectNode(node.id);
             });
-            
-            itemDiv.addEventListener('dblclick', function(e) {
+
+            itemDiv.addEventListener('dblclick', function (e) {
                 e.stopPropagation();
                 toggleNode(node.id);
             });
-            
+
             li.appendChild(itemDiv);
 
 
-// Дочерние элементы
+            // Дочерние элементы
             if (node.children && node.children.length > 0) {
                 const ul = document.createElement('ul');
                 ul.style.display = appState.expandedNodes.has(node.id) ? 'block' : 'none';
-                
+
                 node.children.forEach(child => {
                     ul.appendChild(createTreeNode(child, level + 1));
                 });
-                
+
                 li.appendChild(ul);
             }
-            
+
             return li;
         }
 
         // Выбор узла
         function selectNode(nodeId) {
             appState.selectedNode = nodeId;
-            
+
             // Обновление классов активных элементов
             document.querySelectorAll('.tree-item').forEach(item => {
                 item.classList.remove('active');
             });
-            
+
             const selectedItem = document.querySelector(`#node-${nodeId} .tree-item`);
             if (selectedItem) {
                 selectedItem.classList.add('active');
             }
-            
+
             // Обновление деталей
             updateDetails(nodeId);
-            
+
             // Обновление хлебных крошек
             updateBreadcrumb(nodeId);
         }
@@ -773,17 +792,17 @@ id: "contacts",
             } else {
                 appState.expandedNodes.add(nodeId);
             }
-            
+
             const nodeElement = document.getElementById(`node-${nodeId}`);
             if (nodeElement) {
                 const itemDiv = nodeElement.querySelector('.tree-item');
                 const childUl = nodeElement.querySelector('ul');
-                
+
                 if (itemDiv) {
                     itemDiv.classList.toggle('expanded');
                     itemDiv.classList.toggle('collapsed');
                 }
-                
+
                 if (childUl) {
                     childUl.style.display = appState.expandedNodes.has(nodeId) ? 'block' : 'none';
                 }
@@ -801,10 +820,10 @@ id: "contacts",
                 }
             }
             collectNodes(hierarchyData);
-            
+
             // Добавляем все узлы в expandedNodes
             nodesWithChildren.forEach(id => appState.expandedNodes.add(id));
-            
+
             // Перерендериваем дерево
             renderTree();
         }
@@ -814,7 +833,7 @@ id: "contacts",
             // Оставляем только корневой элемент
             appState.expandedNodes.clear();
             appState.expandedNodes.add('root');
-            
+
             // Перерендериваем дерево
             renderTree();
         }
@@ -830,27 +849,25 @@ id: "contacts",
             const node = findNodeById(hierarchyData, nodeId);
             const detailsContent = document.getElementById('detailsContent');
             const noSelection = document.getElementById('noSelection');
-            
+
             if (!node) return;
-            
+
             noSelection.style.display = 'none';
             detailsContent.innerHTML = createDetailsHTML(node);
         }
 
         // Создание HTML для деталей узла
         function createDetailsHTML(node) {
-            const subsections = node.children && node.children.length > 0 ? 
+            const subsections = node.children && node.children.length > 0 ?
                 node.children.map(child => `
                     <li>
                         <i class="${child.icon}" style="color: ${child.color};"></i>
                         <strong>${child.title}</strong> - ${child.description}
-
-
-<span style="color: #95a5a6; font-size: 0.9em; margin-left: auto;">${child.path}</span>
+                        <span style="color: #95a5a6; font-size: 0.9em; margin-left: auto;">${child.path}</span>
                     </li>
-                `).join('') : 
+                `).join('') :
                 '<li style="font-style: italic; color: #95a5a6;">Нет подразделов</li>';
-            
+
             return `
                 <div class="section-details active">
                     <div class="detail-header">
@@ -896,36 +913,36 @@ id: "contacts",
         function updateBreadcrumb(nodeId) {
             const breadcrumb = document.getElementById('breadcrumb');
             const path = getNodePath(nodeId);
-            
+
             let breadcrumbHTML = '';
             path.forEach((node, index) => {
                 if (index > 0) {
                     breadcrumbHTML += `<i class="fas fa-chevron-right"></i>`;
                 }
-                
+
                 if (index === path.length - 1) {
                     breadcrumbHTML += `<span>${node.title}</span>`;
                 } else {
                     breadcrumbHTML += `<a href="#" data-path="${node.path}" data-node-id="${node.id}">${node.title}</a>`;
                 }
             });
-            
+
             breadcrumb.innerHTML = breadcrumbHTML;
-            
+
             // Добавляем обработчики для ссылок в хлебных крошках
             breadcrumb.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', function(e) {
+                link.addEventListener('click', function (e) {
                     e.preventDefault();
                     const nodeId = this.dataset.nodeId;
                     selectNode(nodeId);
-                    
+
                     // Раскрываем все родительские узлы
                     let currentNode = findNodeById(hierarchyData, nodeId);
                     while (currentNode && currentNode.parentId) {
                         appState.expandedNodes.add(currentNode.parentId);
                         currentNode = findNodeById(hierarchyData, currentNode.parentId);
                     }
-                    
+
                     renderTree();
                 });
             });
@@ -934,16 +951,13 @@ id: "contacts",
         // Обновление счетчика разделов
         function updateTotalSections() {
             const total = countAllNodes(hierarchyData);
-            document.getElementById('totalSections').textContent =
-
-
-total;
+            document.getElementById('totalSections').textContent = total;
         }
 
         // Вспомогательные функции
         function findNodeById(node, id) {
             if (node.id === id) return node;
-            
+
             if (node.children) {
                 for (const child of node.children) {
                     // Добавляем parentId для навигации
@@ -952,59 +966,60 @@ total;
                     if (found) return found;
                 }
             }
-            
+
             return null;
         }
 
         function getNodePath(nodeId) {
             const path = [];
             let currentNode = findNodeById(hierarchyData, nodeId);
-            
+
             while (currentNode) {
                 path.unshift(currentNode);
                 currentNode = currentNode.parentId ? findNodeById(hierarchyData, currentNode.parentId) : null;
             }
-            
+
             return path;
         }
 
         function calculateNodeDepth(node) {
             let depth = 0;
             let currentNode = node;
-            
+
             while (currentNode.parentId) {
                 depth++;
                 currentNode = findNodeById(hierarchyData, currentNode.parentId);
             }
-            
+
             return depth;
         }
 
         function countDescendants(node) {
             let count = 0;
-            
+
             function countChildren(n) {
                 if (n.children) {
                     count += n.children.length;
                     n.children.forEach(countChildren);
                 }
             }
-            
+
             countChildren(node);
             return count;
         }
 
         function countAllNodes(node) {
             let count = 1; // Текущий узел
-            
+
             if (node.children) {
                 node.children.forEach(child => {
                     count += countAllNodes(child);
                 });
             }
-            
+
             return count;
         }
     </script>
 </body>
+
 </html>
