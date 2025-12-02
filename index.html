@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Иерархия разделов сайта</title>
+    <title>Иерархия разделов сайта с поиском</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -55,11 +54,134 @@
             margin: 0 auto 20px;
         }
 
+        .search-container {
+            max-width: 800px;
+            margin: 25px auto;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 25px;
+            padding-left: 60px;
+            font-size: 1.1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box:focus {
+            border-color: #3498db;
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+            font-size: 1.3rem;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-top: 10px;
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 15px 25px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+            padding-left: 30px;
+        }
+
+        .search-result-item .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .search-result-item .info {
+            flex: 1;
+        }
+
+        .search-result-item .title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .search-result-item .path {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .search-result-item .match-count {
+            background: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .search-result-item.highlight {
+            background-color: #e1f5fe;
+            border-left: 4px solid #3498db;
+        }
+
+        .search-stats {
+            padding: 15px 25px;
+            color: #7f8c8d;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .no-results {
+            padding: 30px;
+            text-align: center;
+            color: #95a5a6;
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
         .controls {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 10px;
             flex-wrap: wrap;
         }
 
@@ -134,10 +256,30 @@
         .tree {
             list-style: none;
             padding-left: 0;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
 
-        .tree,
-        .tree ul {
+        .tree::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tree::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .tree::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .tree::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .tree, .tree ul {
             list-style: none;
             margin: 0;
             padding: 0;
@@ -174,7 +316,7 @@
             background: #e0e0e0;
         }
 
-        .tree>li:first-child:before {
+        .tree > li:first-child:before {
             display: none;
         }
 
@@ -188,18 +330,35 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border-left: 4px solid #3498db;
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
         }
 
         .tree-item:hover {
             background: #e8f4fc;
             transform: translateX(5px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.08);
         }
 
         .tree-item.active {
             background: #e1f5fe;
             border-left-color: #2ecc71;
+        }
+
+        .tree-item.search-match {
+            background: #fff8e1;
+            border-left-color: #ffc107;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+
+        .tree-item.search-highlight {
+            background: #ffebee;
+            border-left-color: #f44336;
         }
 
         .item-title {
@@ -266,15 +425,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .detail-header {
@@ -362,6 +514,13 @@
             color: #3498db;
         }
 
+        .search-highlight-text {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
         .footer {
             text-align: center;
             padding: 20px;
@@ -370,29 +529,59 @@
             margin-top: 20px;
         }
 
+        .search-tips {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .search-tips h4 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #3498db;
+        }
+
+        .search-tips ul {
+            padding-left: 20px;
+        }
+
+        .search-tips li {
+            margin-bottom: 5px;
+        }
+
         @media (max-width: 768px) {
             .content-wrapper {
                 flex-direction: column;
             }
-
-            .hierarchy-container,
-            .details-panel {
+            
+            .hierarchy-container, .details-panel {
                 min-width: 100%;
             }
-
+            
             h1 {
                 font-size: 2.2rem;
             }
-
+            
             .controls {
                 flex-direction: column;
                 align-items: center;
             }
-
+            
             .btn {
                 width: 100%;
                 max-width: 300px;
                 justify-content: center;
+            }
+            
+            .search-box {
+                padding: 15px 20px;
+                padding-left: 50px;
+                font-size: 1rem;
             }
         }
 
@@ -427,19 +616,45 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-sitemap"></i> Иерархия разделов сайта</h1>
-            <p class="subtitle">Интерактивное представление структуры веб-сайта с возможностью навигации по разделам</p>
-
+            <h1><i class="fas fa-sitemap"></i> Иерархия разделов сайта с поиском</h1>
+            <p class="subtitle">Интерактивное представление структуры веб-сайта с возможностью навигации и поиска по разделам</p>
+            
+            <div class="search-container">
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" class="search-box" id="searchInput" placeholder="Введите запрос для поиска по названию, описанию или содержимому...">
+                <div class="search-results" id="searchResults">
+                    <div class="search-stats">
+                        <span id="resultsCount">0 результатов</span>
+                        <span id="searchTime">0 мс</span>
+                    </div>
+                    <div id="resultsList"></div>
+                </div>
+            </div>
+            
+            <div class="search-tips">
+                <h4><i class="fas fa-lightbulb"></i> Советы по поиску:</h4>
+                <ul>
+                    <li>Используйте ключевые слова из названия, описания или содержимого разделов</li>
+                    <li>Поиск не чувствителен к регистру</li>
+                    <li>Для точного поиска введите полное название раздела</li>
+                    <li>Нажмите Enter для перехода к первому результату</li>
+                </ul>
+            </div>
+            
             <div class="controls">
                 <button class="btn btn-expand-all" id="expandAll">
                     <i class="fas fa-expand-alt"></i> Раскрыть все
                 </button>
                 <button class="btn btn-collapse-all" id="collapseAll">
                     <i class="fas fa-compress-alt"></i> Свернуть все
+                </button>
+                <button class="btn" id="clearSearch">
+                    <i class="fas fa-times"></i> Очистить поиск
                 </button>
                 <button class="btn" id="resetView">
                     <i class="fas fa-redo"></i> Сбросить вид
@@ -468,8 +683,8 @@
         </div>
 
         <div class="footer">
-            <p>Иерархия разделов сайта &copy; 2023 | Всего разделов: <span id="totalSections">0</span></p>
-            <p>Используйте клик для навигации, двойной клик для раскрытия/сворачивания подразделов</p>
+            <p>Иерархия разделов сайта с поиском &copy; 2023 | Всего разделов: <span id="totalSections">0</span> | <span id="searchStatus">Поиск не активен</span></p>
+            <p>Используйте поиск для быстрого перехода к нужному разделу</p>
         </div>
     </div>
 
@@ -480,72 +695,61 @@
             title: "Главная страница",
             path: "/",
             description: "Основная страница сайта, точка входа для всех пользователей",
-            content: "Добро пожаловать на главную страницу нашего сайта. Отсюда вы можете получить доступ ко всем основным разделам.",
+            content: "Добро пожаловать на главную страницу нашего сайта. Отсюда вы можете получить доступ ко всем основным разделам. Наш сайт предлагает информацию о компании, услугах, портфолио и контактах.",
             icon: "fas fa-home",
             color: "#3498db",
             children: [
                 {
                     id: "about",
-                    title: "Экуменизм",
+                    title: "О компании",
                     path: "/about",
                     description: "Раздел с информацией о компании, её истории и миссии",
-                    content: 'Мое сообщение от 29 ноября: "Митрополиту Арсению на Украине стало плохо время суда, ему вызвали скорую помощь. 28 ноября 2025 года в районном суде Днепра состоялось заседание по второму делу, возбужденному против наместника Святогорской Лавры митрополита Арсения. Рассматривалось заявление адвокатов об отводе следователя. Как сообщает пресс-служба Святогорской лавры, слушание сопровождалось серьезными нарушениями процессуальных прав защиты, а состояние здоровья владыки ухудшилось прямо в зале суда, ему вызвали скорую помощь. Странное совпадение с митр. Феодосием, преследуемых иерархам резко стало плохо." "Сегодня днем стали известны подробности здоровья митрополита Черкасского и Каневского Феодосия и возможные причины его критического состояния. Как сообщают источники среди окружения и врачей митрополита, есть основания утверждать, что иерарх был отравлен, как мы с вами и предположили."И вот сегодняшние новости: Состояние митрополита Феодосия ухудшается, – Черкасская епархия 1 декабря 2025 года в пресс-службе Черкасской епархии прокомментировали состояние здоровья митрополита Феодосия, который находится в больнице после отравления неизвестными веществами. Как сказано в тексте, лечение пока не приносит положительных результатов. Более того, несмотря на интенсивную терапию, отрицательные диагностические показатели по внутренним органам продолжают расти. <br> «Врачами проводится всесторонняя диагностика, но причина ухудшения состояния здоровья владыки пока не выяснена. Просим всех православных христиан усилить молитвы за здоровье и спасение митрополита Феодосия», – сказано в тексте.',
+                    content: "Наша компания была основана в 2010 году и с тех пор успешно развивается на рынке IT-услуг. Мы специализируемся на создании современных веб-решений и мобильных приложений.",
                     icon: "fas fa-building",
                     color: "#2ecc71",
                     children: [
                         {
                             id: "history",
-                            title: "История",
+                            title: "История компании",
                             path: "/about/history",
                             description: "История развития компании с момента основания",
-                            content: "Основание компании, ключевые вехи развития, достижения и награды.",
+                            content: "Основание компании в 2010 году, ключевые вехи развития, достижения и награды. В 2015 году мы открыли второй офис, а в 2020 запустили международное направление.",
                             icon: "fas fa-history",
                             color: "#9b59b6"
                         },
                         {
                             id: "team",
-                            title: "Команда",
+                            title: "Наша команда",
                             path: "/about/team",
                             description: "Знакомство с нашей командой специалистов",
-                            content: "В нашей компании работают высококвалифицированные специалисты с опытом работы более 5 лет.",
+                            content: "В нашей компании работают высококвалифицированные специалисты с опытом работы более 5 лет. Мы ценим профессионализм и постоянно обучаем наших сотрудников.",
                             icon: "fas fa-users",
                             color: "#e74c3c",
                             children: [
                                 {
                                     id: "management",
-                                    title: "Руководство",
+                                    title: "Руководство компании",
                                     path: "/about/team/management",
                                     description: "Руководящий состав компании",
-                                    content: "Опытные руководители с многолетним опытом в управлении IT-проектами.",
+                                    content: "Опытные руководители с многолетним опытом в управлении IT-проектами. Наши менеджеры имеют сертификаты PMP и Scrum Master.",
                                     icon: "fas fa-user-tie",
-                                    color: "#f39c12",
-                                    children: [
-                                        {
-                                            id: "management1",
-                                            title: "Руководство1",
-                                            path: "/about/team/management/1",
-                                            description: "Руководящий состав компании",
-                                            content: "Опытные руководители с многолетним опытом в управлении IT-проектами.",
-                                            icon: "fas fa-user-tie",
-                                            color: "#f39c12"
-                                        }
-                                    ]
+                                    color: "#f39c12"
                                 },
                                 {
                                     id: "developers",
-                                    title: "Разработчики",
+                                    title: "Разработчики программного обеспечения",
                                     path: "/about/team/developers",
                                     description: "Команда разработчиков",
-                                    content: "Профессиональные разработчики, специализирующиеся на различных технологиях.",
+                                    content: "Профессиональные разработчики, специализирующиеся на различных технологиях: JavaScript, Python, Java, Go, React, Vue.js, Node.js и других.",
                                     icon: "fas fa-code",
                                     color: "#1abc9c"
                                 },
                                 {
                                     id: "designers",
-                                    title: "Дизайнеры",
+                                    title: "Дизайнеры интерфейсов",
                                     path: "/about/team/designers",
                                     description: "Команда дизайнеров",
-                                    content: "Креативные дизайнеры, создающие удобные и красивые интерфейсы.",
+                                    content: "Креативные дизайнеры, создающие удобные и красивые интерфейсы. Специалисты по UX/UI дизайну с пониманием психологии пользователей.",
                                     icon: "fas fa-paint-brush",
                                     color: "#d35400"
                                 }
@@ -556,7 +760,7 @@
                             title: "Миссия и ценности",
                             path: "/about/mission",
                             description: "Миссия компании и корпоративные ценности",
-                            content: "Наша миссия - создавать качественные IT-решения, которые делают жизнь людей проще и удобнее.",
+                            content: "Наша миссия - создавать качественные IT-решения, которые делают жизнь людей проще и удобнее. Ценности: инновации, качество, клиентоориентированность, развитие сотрудников.",
                             icon: "fas fa-bullseye",
                             color: "#34495e"
                         }
@@ -564,10 +768,10 @@
                 },
                 {
                     id: "services",
-                    title: "Услуги",
+                    title: "Услуги и сервисы",
                     path: "/services",
                     description: "Перечень предоставляемых услуг и сервисов",
-                    content: "Мы предлагаем широкий спектр услуг в области веб-разработки, дизайна и цифрового маркетинга.",
+                    content: "Мы предлагаем широкий спектр услуг в области веб-разработки, дизайна и цифрового маркетинга. Каждая услуга выполняется с максимальным вниманием к деталям.",
                     icon: "fas fa-concierge-bell",
                     color: "#e67e22",
                     children: [
@@ -576,7 +780,7 @@
                             title: "Веб-разработка",
                             path: "/services/web-development",
                             description: "Создание веб-сайтов и веб-приложений",
-                            content: "Полный цикл разработки: от проектирования до запуска и поддержки.",
+                            content: "Полный цикл разработки: от проектирования до запуска и поддержки. Создаем корпоративные сайты, интернет-магазины, веб-приложения и порталы.",
                             icon: "fas fa-laptop-code",
                             color: "#3498db"
                         },
@@ -585,25 +789,25 @@
                             title: "Мобильные приложения",
                             path: "/services/mobile-apps",
                             description: "Разработка приложений для iOS и Android",
-                            content: "Создание нативных и кроссплатформенных мобильных приложений.",
+                            content: "Создание нативных и кроссплатформенных мобильных приложений. Разработка под iOS (Swift) и Android (Kotlin), а также Flutter и React Native приложения.",
                             icon: "fas fa-mobile-alt",
                             color: "#9b59b6"
                         },
                         {
                             id: "design",
-                            title: "Дизайн",
+                            title: "Дизайн и UI/UX",
                             path: "/services/design",
                             description: "Дизайн интерфейсов и фирменного стиля",
-                            content: "Создание уникального дизайна, который выделит ваш бренд среди конкурентов.",
+                            content: "Создание уникального дизайна, который выделит ваш бренд среди конкурентов. UX исследования, UI дизайн, создание дизайн-систем и гайдлайнов.",
                             icon: "fas fa-palette",
                             color: "#e74c3c"
                         },
                         {
                             id: "seo",
-                            title: "SEO-оптимизация",
+                            title: "SEO-оптимизация и продвижение",
                             path: "/services/seo",
                             description: "Поисковая оптимизация и продвижение",
-                            content: "Увеличение видимости вашего сайта в поисковых системах.",
+                            content: "Увеличение видимости вашего сайта в поисковых системах. Технический SEO, контент-маркетинг, аналитика и аудит сайтов.",
                             icon: "fas fa-search",
                             color: "#2ecc71"
                         }
@@ -611,10 +815,10 @@
                 },
                 {
                     id: "portfolio",
-                    title: "Портфолио",
+                    title: "Портфолио проектов",
                     path: "/portfolio",
                     description: "Примеры выполненных работ и проектов",
-                    content: "В нашем портфолио представлены проекты различной сложности для клиентов из разных отраслей.",
+                    content: "В нашем портфолио представлены проекты различной сложности для клиентов из разных отраслей: ритейл, образование, здравоохранение, финансы и другие.",
                     icon: "fas fa-briefcase",
                     color: "#1abc9c",
                     children: [
@@ -623,16 +827,16 @@
                             title: "Веб-сайты",
                             path: "/portfolio/websites",
                             description: "Примеры созданных веб-сайтов",
-                            content: "Корпоративные сайты, интернет-магазины, лендинги и порталы.",
+                            content: "Корпоративные сайты, интернет-магазины, лендинги и порталы. Современные технологии, адаптивный дизайн, высокая производительность.",
                             icon: "fas fa-globe",
                             color: "#3498db"
                         },
                         {
                             id: "applications",
-                            title: "Приложения",
+                            title: "Приложения и программное обеспечение",
                             path: "/portfolio/applications",
                             description: "Примеры разработанных приложений",
-                            content: "Мобильные и десктопные приложения для бизнеса и потребителей.",
+                            content: "Мобильные и десктопные приложения для бизнеса и потребителей. CRM системы, ERP решения, мобильные приложения для iOS и Android.",
                             icon: "fas fa-mobile",
                             color: "#9b59b6"
                         }
@@ -640,19 +844,19 @@
                 },
                 {
                     id: "blog",
-                    title: "Блог",
+                    title: "Блог и статьи",
                     path: "/blog",
                     description: "Статьи и новости компании",
-                    content: "Актуальные статьи о технологиях, дизайне и маркетинге.",
+                    content: "Актуальные статьи о технологиях, дизайне и маркетинге. Советы по разработке, обзоры инструментов, кейсы и аналитика рынка IT.",
                     icon: "fas fa-blog",
                     color: "#f39c12"
                 },
                 {
                     id: "contacts",
-                    title: "Контакты",
+                    title: "Контакты и обратная связь",
                     path: "/contacts",
                     description: "Контактная информация и форма обратной связи",
-                    content: "Свяжитесь с нами любым удобным способом. Мы всегда рады новым проектам и сотрудничеству.",
+                    content: "Свяжитесь с нами любым удобным способом. Мы всегда рады новым проектам и сотрудничеству. Ответим на вопросы и предложим оптимальное решение.",
                     icon: "fas fa-address-book",
                     color: "#e74c3c",
                     children: [
@@ -661,16 +865,16 @@
                             title: "Обратная связь",
                             path: "/contacts/feedback",
                             description: "Форма для отправки сообщений",
-                            content: "Задайте вопрос или отправьте предложение о сотрудничестве.",
+                            content: "Задайте вопрос или отправьте предложение о сотрудничестве. Наши менеджеры свяжутся с вами в течение 24 часов в рабочие дни.",
                             icon: "fas fa-comments",
                             color: "#3498db"
                         },
                         {
                             id: "offices",
-                            title: "Наши офисы",
+                            title: "Наши офисы и филиалы",
                             path: "/contacts/offices",
                             description: "Адреса офисов и филиалов",
-                            content: "Мы имеем представительства в нескольких городах страны.",
+                            content: "Мы имеем представительства в нескольких городах страны. Главный офис находится в Москве, филиалы в Санкт-Петербурге и Казани.",
                             icon: "fas fa-map-marker-alt",
                             color: "#2ecc71"
                         }
@@ -683,22 +887,282 @@
         let appState = {
             expandedNodes: new Set(['root']),
             selectedNode: null,
-            breadcrumbPath: []
+            breadcrumbPath: [],
+            searchQuery: '',
+            searchResults: [],
+            searchActive: false
         };
 
         // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             renderTree();
             updateTotalSections();
-
+            
             // Обработчики кнопок
             document.getElementById('expandAll').addEventListener('click', expandAll);
             document.getElementById('collapseAll').addEventListener('click', collapseAll);
+            document.getElementById('clearSearch').addEventListener('click', clearSearch);
             document.getElementById('resetView').addEventListener('click', resetView);
-
+            
+            // Обработчики поиска
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            
+            searchInput.addEventListener('input', function(e) {
+                performSearch(e.target.value);
+            });
+            
+            searchInput.addEventListener('focus', function() {
+                if (appState.searchResults.length > 0) {
+                    searchResults.style.display = 'block';
+                }
+            });
+            
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && appState.searchResults.length > 0) {
+                    // Переход к первому результату
+                    const firstResult = appState.searchResults[0];
+                    navigateToSearchResult(firstResult.node);
+                    e.preventDefault();
+                }
+                
+                if (e.key === 'Escape') {
+                    clearSearch();
+                }
+            });
+            
+            // Закрытие результатов поиска при клике вне области
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+            
             // Изначально выбираем корневой элемент
             selectNode('root');
         });
+
+        // Выполнение поиска
+        function performSearch(query) {
+            const startTime = performance.now();
+            appState.searchQuery = query.trim().toLowerCase();
+            
+            if (!appState.searchQuery) {
+                clearSearch();
+                return;
+            }
+            
+            appState.searchActive = true;
+            appState.searchResults = [];
+            
+            // Поиск по всем узлам
+            searchNodes(hierarchyData, appState.searchQuery);
+            
+            // Сортировка результатов по релевантности (по количеству совпадений)
+            appState.searchResults.sort((a, b) => b.score - a.score);
+            
+            // Отображение результатов
+            displaySearchResults();
+            
+            // Подсветка найденных элементов в дереве
+            highlightSearchResults();
+            
+            const endTime = performance.now();
+            const searchTime = Math.round(endTime - startTime);
+            
+            document.getElementById('searchTime').textContent = `${searchTime} мс`;
+            document.getElementById('searchStatus').textContent = `Найдено: ${appState.searchResults.length} результатов`;
+            
+            // Показываем панель результатов
+            document.getElementById('searchResults').style.display = 'block';
+        }
+
+        // Рекурсивный поиск по узлам
+        function searchNodes(node, query) {
+            let score = 0;
+            let matches = [];
+            
+            // Поиск в заголовке
+            if (node.title.toLowerCase().includes(query)) {
+                score += 3;
+                matches.push({ field: 'title', text: node.title });
+            }
+            
+            // Поиск в описании
+            if (node.description.toLowerCase().includes(query)) {
+                score += 2;
+                matches.push({ field: 'description', text: node.description });
+            }
+            
+            // Поиск в содержимом
+            if (node.content.toLowerCase().includes(query)) {
+                score += 1;
+                matches.push({ field: 'content', text: node.content });
+            }
+            
+            // Поиск в пути
+            if (node.path.toLowerCase().includes(query)) {
+                score += 1;
+                matches.push({ field: 'path', text: node.path });
+            }
+            
+            // Если есть совпадения, добавляем в результаты
+            if (score > 0) {
+                appState.searchResults.push({
+                    node: node,
+                    score: score,
+                    matches: matches,
+                    highlightedTitle: highlightText(node.title, query),
+                    highlightedDescription: highlightText(node.description, query)
+                });
+            }
+            
+            // Рекурсивный поиск в дочерних элементах
+            if (node.children) {
+                node.children.forEach(child => {
+                    searchNodes(child, query);
+                });
+            }
+        }
+
+        // Подсветка текста в результатах поиска
+        function highlightText(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight-text">$1</span>');
+        }
+
+        // Отображение результатов поиска
+        function displaySearchResults() {
+            const resultsList = document.getElementById('resultsList');
+            const resultsCount = document.getElementById('resultsCount');
+            
+            if (appState.searchResults.length === 0) {
+                resultsList.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>Ничего не найдено</h3>
+                        <p>Попробуйте изменить запрос или использовать другие ключевые слова</p>
+                    </div>
+                `;
+                resultsCount.textContent = '0 результатов';
+                return;
+            }
+            
+            let resultsHTML = '';
+            
+            appState.searchResults.forEach((result, index) => {
+                const isSelected = index === 0;
+                resultsHTML += `
+                    <div class="search-result-item ${isSelected ? 'highlight' : ''}" 
+                         data-node-id="${result.node.id}"
+                         onclick="navigateToSearchResult(this.dataset.nodeId)">
+                        <div class="icon" style="background: ${result.node.color};">
+                            <i class="${result.node.icon}"></i>
+                        </div>
+                            <div class="info">
+                            <div class="title">${result.highlightedTitle}</div>
+                            <div class="path">${result.node.path}</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d; margin-top: 5px;">
+                                ${result.highlightedDescription}
+                            </div>
+                        </div>
+                        <div class="match-count">${result.score}</div>
+                    </div>
+                `;
+            });
+            
+            resultsList.innerHTML = resultsHTML;
+            resultsCount.textContent = `${appState.searchResults.length} результат(ов)`;
+        }
+
+        // Подсветка найденных элементов в дереве
+        function highlightSearchResults() {
+            // Сначала снимаем все подсветки
+            document.querySelectorAll('.tree-item').forEach(item => {
+                item.classList.remove('search-match', 'search-highlight');
+            });
+            
+            // Подсвечиваем найденные элементы
+            appState.searchResults.forEach((result, index) => {
+                const nodeElement = document.getElementById(`node-${result.node.id}`);
+                if (nodeElement) {
+                    const itemDiv = nodeElement.querySelector('.tree-item');
+                    if (itemDiv) {
+                        itemDiv.classList.add('search-match');
+                        
+                        // Первый результат подсвечиваем по-особому
+                        if (index === 0) {
+                            itemDiv.classList.add('search-highlight');
+                        }
+                    }
+                }
+            });
+        }
+
+        // Навигация к результату поиска
+        function navigateToSearchResult(nodeId) {
+            const node = findNodeById(nodeId);
+            if (!node) return;
+            
+            // Раскрываем всех родителей узла
+            expandAllParents(node);
+            
+            // Выбираем узел
+            selectNode(node.id);
+            
+            // Прокручиваем к элементу
+            const nodeElement = document.getElementById(`node-${node.id}`);
+            if (nodeElement) {
+                nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Мигающая анимация для привлечения внимания
+                const itemDiv = nodeElement.querySelector('.tree-item');
+                if (itemDiv) {
+                    itemDiv.style.animation = 'none';
+                    setTimeout(() => {
+                        itemDiv.style.animation = 'pulse 1s 3';
+                    }, 10);
+                }
+            }
+            
+            // Скрываем результаты поиска
+            document.getElementById('searchResults').style.display = 'none';
+            
+            // Очищаем поле поиска
+            document.getElementById('searchInput').value = '';
+            appState.searchActive = false;
+            document.getElementById('searchStatus').textContent = 'Поиск не активен';
+        }
+
+        // Раскрытие всех родителей узла
+        function expandAllParents(node) {
+            let currentNode = node;
+            
+            while (currentNode.parentId) {
+                appState.expandedNodes.add(currentNode.parentId);
+                currentNode = findNodeById(currentNode.parentId);
+            }
+            
+            renderTree();
+        }
+
+        // Очистка поиска
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            appState.searchQuery = '';
+            appState.searchResults = [];
+            appState.searchActive = false;
+            
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('searchStatus').textContent = 'Поиск не активен';
+            
+            // Снимаем подсветку с элементов дерева
+            document.querySelectorAll('.tree-item').forEach(item => {
+                item.classList.remove('search-match', 'search-highlight');
+            });
+        }
 
         // Рендеринг дерева
         function renderTree() {
@@ -712,75 +1176,87 @@
             const li = document.createElement('li');
             li.id = `node-${node.id}`;
             li.dataset.nodeId = node.id;
-
+            
             const itemDiv = document.createElement('div');
             itemDiv.className = 'tree-item';
             if (appState.selectedNode === node.id) {
                 itemDiv.classList.add('active');
             }
-
+            
             if (node.children && node.children.length > 0) {
                 itemDiv.classList.add(appState.expandedNodes.has(node.id) ? 'expanded' : 'collapsed');
             }
-
+            
+            // Проверяем, является ли узел результатом поиска
+            const searchResult = appState.searchResults.find(r => r.node.id === node.id);
+            if (searchResult) {
+                itemDiv.classList.add('search-match');
+                if (appState.searchResults[0] && appState.searchResults[0].node.id === node.id) {
+                    itemDiv.classList.add('search-highlight');
+                }
+            }
+            
             // Содержимое элемента
+            const displayTitle = searchResult ? 
+                highlightText(node.title, appState.searchQuery) : 
+                node.title;
+            
             itemDiv.innerHTML = `
                 <div>
-                    <div class="item-title"><i class="${node.icon}" style="color: ${node.color}; margin-right: 8px;"></i> ${node.title}</div>
+                    <div class="item-title"><i class="${node.icon}" style="color: ${node.color}; margin-right: 8px;"></i> ${displayTitle}</div>
                     <div class="item-path">${node.path}</div>
                 </div>
-                ${node.children && node.children.length > 0 ?
-                    `<div class="item-icon"><i class="fas fa-chevron-down"></i></div>` :
+                ${node.children && node.children.length > 0 ? 
+                    `<div class="item-icon"><i class="fas fa-chevron-down"></i></div>` : 
                     `<div class="item-icon"><i class="fas fa-file"></i></div>`
                 }
             `;
-
+            
             // Обработчики событий
-            itemDiv.addEventListener('click', function (e) {
+            itemDiv.addEventListener('click', function(e) {
                 e.stopPropagation();
                 selectNode(node.id);
             });
-
-            itemDiv.addEventListener('dblclick', function (e) {
+            
+            itemDiv.addEventListener('dblclick', function(e) {
                 e.stopPropagation();
                 toggleNode(node.id);
             });
-
+            
             li.appendChild(itemDiv);
-
-
+            
             // Дочерние элементы
             if (node.children && node.children.length > 0) {
                 const ul = document.createElement('ul');
                 ul.style.display = appState.expandedNodes.has(node.id) ? 'block' : 'none';
-
+                
                 node.children.forEach(child => {
                     ul.appendChild(createTreeNode(child, level + 1));
                 });
-
+                
                 li.appendChild(ul);
             }
-
+            
             return li;
         }
 
         // Выбор узла
         function selectNode(nodeId) {
             appState.selectedNode = nodeId;
-
+            
             // Обновление классов активных элементов
             document.querySelectorAll('.tree-item').forEach(item => {
                 item.classList.remove('active');
             });
-
+            
             const selectedItem = document.querySelector(`#node-${nodeId} .tree-item`);
             if (selectedItem) {
                 selectedItem.classList.add('active');
             }
-
+            
             // Обновление деталей
             updateDetails(nodeId);
-
+            
             // Обновление хлебных крошек
             updateBreadcrumb(nodeId);
         }
@@ -792,17 +1268,17 @@
             } else {
                 appState.expandedNodes.add(nodeId);
             }
-
+            
             const nodeElement = document.getElementById(`node-${nodeId}`);
             if (nodeElement) {
                 const itemDiv = nodeElement.querySelector('.tree-item');
                 const childUl = nodeElement.querySelector('ul');
-
+                
                 if (itemDiv) {
                     itemDiv.classList.toggle('expanded');
                     itemDiv.classList.toggle('collapsed');
                 }
-
+                
                 if (childUl) {
                     childUl.style.display = appState.expandedNodes.has(nodeId) ? 'block' : 'none';
                 }
@@ -820,10 +1296,10 @@
                 }
             }
             collectNodes(hierarchyData);
-
+            
             // Добавляем все узлы в expandedNodes
             nodesWithChildren.forEach(id => appState.expandedNodes.add(id));
-
+            
             // Перерендериваем дерево
             renderTree();
         }
@@ -833,7 +1309,7 @@
             // Оставляем только корневой элемент
             appState.expandedNodes.clear();
             appState.expandedNodes.add('root');
-
+            
             // Перерендериваем дерево
             renderTree();
         }
@@ -841,33 +1317,43 @@
         // Сброс вида
         function resetView() {
             collapseAll();
+            clearSearch();
             selectNode('root');
         }
 
         // Обновление деталей выбранного узла
         function updateDetails(nodeId) {
-            const node = findNodeById(hierarchyData, nodeId);
+            const node = findNodeById(nodeId);
             const detailsContent = document.getElementById('detailsContent');
             const noSelection = document.getElementById('noSelection');
-
+            
             if (!node) return;
-
+            
             noSelection.style.display = 'none';
             detailsContent.innerHTML = createDetailsHTML(node);
         }
 
         // Создание HTML для деталей узла
         function createDetailsHTML(node) {
-            const subsections = node.children && node.children.length > 0 ?
+            const subsections = node.children && node.children.length > 0 ? 
                 node.children.map(child => `
-                    <li>
+                    <li onclick="selectNode('${child.id}')" style="cursor: pointer;">
                         <i class="${child.icon}" style="color: ${child.color};"></i>
                         <strong>${child.title}</strong> - ${child.description}
                         <span style="color: #95a5a6; font-size: 0.9em; margin-left: auto;">${child.path}</span>
                     </li>
-                `).join('') :
+                `).join('') : 
                 '<li style="font-style: italic; color: #95a5a6;">Нет подразделов</li>';
-
+            
+            // Подсветка текста поиска, если поиск активен
+            const displayContent = appState.searchQuery && node.content.toLowerCase().includes(appState.searchQuery) ?
+                highlightText(node.content, appState.searchQuery) :
+                node.content;
+                
+            const displayDescription = appState.searchQuery && node.description.toLowerCase().includes(appState.searchQuery) ?
+                highlightText(node.description, appState.searchQuery) :
+                node.description;
+            
             return `
                 <div class="section-details active">
                     <div class="detail-header">
@@ -883,12 +1369,12 @@
                     <div class="detail-content">
                         <div class="detail-section">
                             <h3><i class="fas fa-info-circle"></i> Описание</h3>
-                            <p>${node.description}</p>
+                            <p>${displayDescription}</p>
                         </div>
                         
                         <div class="detail-section">
                             <h3><i class="fas fa-file-alt"></i> Содержание</h3>
-                            <p>${node.content}</p>
+                            <p>${displayContent}</p>
                         </div>
                         
                         <div class="detail-section">
@@ -913,37 +1399,31 @@
         function updateBreadcrumb(nodeId) {
             const breadcrumb = document.getElementById('breadcrumb');
             const path = getNodePath(nodeId);
-
+            
             let breadcrumbHTML = '';
             path.forEach((node, index) => {
                 if (index > 0) {
                     breadcrumbHTML += `<i class="fas fa-chevron-right"></i>`;
                 }
-
+                
                 if (index === path.length - 1) {
                     breadcrumbHTML += `<span>${node.title}</span>`;
                 } else {
                     breadcrumbHTML += `<a href="#" data-path="${node.path}" data-node-id="${node.id}">${node.title}</a>`;
                 }
             });
-
+            
             breadcrumb.innerHTML = breadcrumbHTML;
-
+            
             // Добавляем обработчики для ссылок в хлебных крошках
             breadcrumb.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', function (e) {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
                     const nodeId = this.dataset.nodeId;
                     selectNode(nodeId);
-
+                    
                     // Раскрываем все родительские узлы
-                    let currentNode = findNodeById(hierarchyData, nodeId);
-                    while (currentNode && currentNode.parentId) {
-                        appState.expandedNodes.add(currentNode.parentId);
-                        currentNode = findNodeById(hierarchyData, currentNode.parentId);
-                    }
-
-                    renderTree();
+                    expandAllParents(findNodeById(nodeId));
                 });
             });
         }
@@ -955,71 +1435,74 @@
         }
 
         // Вспомогательные функции
-        function findNodeById(node, id) {
-            if (node.id === id) return node;
-
-            if (node.children) {
-                for (const child of node.children) {
-                    // Добавляем parentId для навигации
-                    child.parentId = node.id;
-                    const found = findNodeById(child, id);
-                    if (found) return found;
+        function findNodeById(nodeId) {
+            function findNode(node, id) {
+                if (node.id === id) return node;
+                
+                if (node.children) {
+                    for (const child of node.children) {
+                        // Добавляем parentId для навигации
+                        child.parentId = node.id;
+                        const found = findNode(child, id);
+                        if (found) return found;
+                    }
                 }
+                
+                return null;
             }
-
-            return null;
+            
+            return findNode(hierarchyData, nodeId);
         }
 
         function getNodePath(nodeId) {
             const path = [];
-            let currentNode = findNodeById(hierarchyData, nodeId);
-
+            let currentNode = findNodeById(nodeId);
+            
             while (currentNode) {
                 path.unshift(currentNode);
-                currentNode = currentNode.parentId ? findNodeById(hierarchyData, currentNode.parentId) : null;
+                currentNode = currentNode.parentId ? findNodeById(currentNode.parentId) : null;
             }
-
+            
             return path;
         }
 
         function calculateNodeDepth(node) {
             let depth = 0;
             let currentNode = node;
-
+            
             while (currentNode.parentId) {
                 depth++;
-                currentNode = findNodeById(hierarchyData, currentNode.parentId);
+                currentNode = findNodeById(currentNode.parentId);
             }
-
+            
             return depth;
         }
 
         function countDescendants(node) {
             let count = 0;
-
+            
             function countChildren(n) {
                 if (n.children) {
                     count += n.children.length;
                     n.children.forEach(countChildren);
                 }
             }
-
+            
             countChildren(node);
             return count;
         }
 
         function countAllNodes(node) {
             let count = 1; // Текущий узел
-
+            
             if (node.children) {
                 node.children.forEach(child => {
                     count += countAllNodes(child);
                 });
             }
-
+            
             return count;
         }
     </script>
 </body>
-
 </html>
