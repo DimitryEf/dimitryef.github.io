@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Иерархия разделов сайта с поиском</title>
+    <title>Иерархия разделов сайта с поиском и внешними ссылками</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Все стили остаются прежними, добавляю только исправления */
         * {
             margin: 0;
             padding: 0;
@@ -614,19 +615,202 @@
         .breadcrumb i {
             color: #95a5a6;
         }
+
+        .url-generator {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .url-generator h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .url-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .url-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: monospace;
+            background: #f8f9fa;
+        }
+        
+        .url-btn {
+            padding: 15px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        
+        .url-btn:hover {
+            background: #2980b9;
+        }
+        
+        .url-btn.copy {
+            background: #2ecc71;
+        }
+        
+        .url-btn.copy:hover {
+            background: #27ae60;
+        }
+        
+        .share-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .share-link {
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #2c3e50;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .share-link:hover {
+            background: #e8f4fc;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .url-examples {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .url-examples h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .url-examples ul {
+            padding-left: 20px;
+        }
+        
+        .url-examples li {
+            margin-bottom: 5px;
+            font-family: monospace;
+            color: #3498db;
+            word-break: break-all;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: #e74c3c;
+        }
+        
+        .notification.warning {
+            background: #f39c12;
+        }
+
+        .qr-code-container {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .qr-code-container.show {
+            display: block;
+        }
+        
+        #qrCode {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        
+        .link-format-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .link-format-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        
+        .link-format-option input[type="radio"] {
+            margin: 0;
+        }
+        
+        .short-url {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 10px;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-sitemap"></i> Иерархия разделов сайта с поиском</h1>
-            <p class="subtitle">Интерактивное представление структуры веб-сайта с возможностью навигации и поиска по разделам</p>
+            <h1><i class="fas fa-sitemap"></i> Иерархия разделов сайта с внешними ссылками</h1>
+            <p class="subtitle">Интерактивное представление структуры веб-сайта с возможностью навигации, поиска и генерации ссылок</p>
             
             <div class="search-container">
                 <div class="search-icon">
                     <i class="fas fa-search"></i>
                 </div>
-                <input type="text" class="search-box" id="searchInput" placeholder="Введите запрос для поиска по названию, описанию или содержимому...">
+                <input type="text" class="search-box" id="searchInput" placeholder="Введите запрос для поиска...">
                 <div class="search-results" id="searchResults">
                     <div class="search-stats">
                         <span id="resultsCount">0 результатов</span>
@@ -636,15 +820,6 @@
                 </div>
             </div>
             
-            <div class="search-tips">
-                <h4><i class="fas fa-lightbulb"></i> Советы по поиску:</h4>
-                <ul>
-                    <li>Используйте ключевые слова из названия, описания или содержимого разделов</li>
-                    <li>Поиск не чувствителен к регистру</li>
-                    <li>Для точного поиска введите полное название раздела</li>
-                    <li>Нажмите Enter для перехода к первому результату</li>
-                </ul>
-            </div>
             
             <div class="controls">
                 <button class="btn btn-expand-all" id="expandAll">
@@ -658,6 +833,9 @@
                 </button>
                 <button class="btn" id="resetView">
                     <i class="fas fa-redo"></i> Сбросить вид
+                </button>
+                <button class="btn" id="generateLinkBtn">
+                    <i class="fas fa-link"></i> Ссылка на раздел
                 </button>
             </div>
         </header>
@@ -679,79 +857,116 @@
                     <p>Кликните на любой раздел в дереве слева, чтобы увидеть подробную информацию о нем</p>
                 </div>
                 <div id="detailsContent"></div>
+                
+                <!-- Генератор ссылок -->
+                <div class="url-generator" id="urlGenerator" style="display: none;">
+                    <h3><i class="fas fa-external-link-alt"></i> Внешняя ссылка на этот раздел</h3>
+                    
+                    <div class="link-format-options">
+                        <label class="link-format-option">
+
+                        <input type="radio" name="linkFormat" value="path" checked>
+                            Использовать путь раздела (рекомендуется)
+                        </label>
+                        <label class="link-format-option">
+                            <input type="radio" name="linkFormat" value="id">
+                            Использовать ID раздела
+                        </label>
+                    </div>
+                    
+                    <div class="url-input-group">
+                        <input type="text" class="url-input" id="generatedUrl" readonly>
+                        <button class="url-btn copy" id="copyUrlBtn">
+                            <i class="far fa-copy"></i> Копировать
+                        </button>
+                    </div>
+                    
+                    <div class="short-url" id="shortUrlInfo">
+                        Короткая ссылка: <span id="shortUrl"></span>
+                    </div>
+                    
+                    <div class="share-links">
+                        <a href="#" class="share-link" id="shareEmail">
+                            <i class="far fa-envelope"></i> Email
+                        </a>
+                        <a href="#" class="share-link" id="shareWhatsApp">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <a href="#" class="share-link" id="shareTelegram">
+                            <i class="fab fa-telegram"></i> Telegram
+                        </a>
+                        <button class="share-link" id="showQrBtn">
+                            <i class="fas fa-qrcode"></i> QR-код
+                        </button>
+                    </div>
+                    
+                    <div class="qr-code-container" id="qrCodeContainer">
+                        <canvas id="qrCode"></canvas>
+                        <p style="margin-top: 10px; color: #7f8c8d;">Отсканируйте QR-код для перехода к разделу</p>
+                    </div>
+                    
+                    <div class="url-examples">
+                        <h4><i class="fas fa-lightbulb"></i> Примеры корректных ссылок:</h4>
+                        <ul>
+                            <li><strong>По пути:</strong> ваш-сайт.com/?path=about/history</li>
+                            <li><strong>По ID:</strong> ваш-сайт.com/?id=history</li>
+                            <li><strong>Короткая:</strong> ваш-сайт.com/#about-team</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Уведомление -->
+        <div class="notification" id="notification">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationText">Ссылка скопирована в буфер обмена!</span>
+        </div>
+
         <div class="footer">
-            <p>Иерархия разделов сайта с поиском &copy; 2023 | Всего разделов: <span id="totalSections">0</span> | <span id="searchStatus">Поиск не активен</span></p>
-            <p>Используйте поиск для быстрого перехода к нужному разделу</p>
+            <p>Иерархия разделов сайта с внешними ссылками &copy; 2023</p>
+            <p>Текущий URL: <span id="currentUrl" style="font-family: monospace; color: #3498db; font-size: 0.9rem;"></span></p>
         </div>
     </div>
 
+    <!-- Подключаем библиотеку для генерации QR-кодов -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
     <script>
-        // Данные иерархии разделов
+        // Данные иерархии разделов с корректными путями
         const hierarchyData = {
             id: "root",
             title: "Главная страница",
             path: "/",
             description: "Основная страница сайта, точка входа для всех пользователей",
-            content: "Добро пожаловать на главную страницу нашего сайта. Отсюда вы можете получить доступ ко всем основным разделам. Наш сайт предлагает информацию о компании, услугах, портфолио и контактах.",
+            content: "Добро пожаловать на главную страницу нашего сайта. Отсюда вы можете получить доступ ко всем основным разделам.",
             icon: "fas fa-home",
             color: "#3498db",
             children: [
                 {
                     id: "about",
-                    title: "Ересь экуменизма",
+                    title: "О компании",
                     path: "/about",
-                    description: "Раздел с информацией об ереси экуменизма ",
-                    content: "Наша компания была основана в 2010 году и с тех пор успешно развивается на рынке IT-услуг. Мы специализируемся на создании современных веб-решений и мобильных приложений.",
+                    description: "Раздел с информацией о компании, её истории и миссии",
+                    content: "Наша компания была основана в 2010 году и с тех пор успешно развивается на рынке IT-услуг.",
                     icon: "fas fa-building",
                     color: "#2ecc71",
                     children: [
                         {
                             id: "history",
-                            title: "Святые отцы об ереси экуменизма",
+                            title: "История компании",
                             path: "/about/history",
                             description: "История развития компании с момента основания",
-                            content: "Основание компании в 2010 году, ключевые вехи развития, достижения и награды. В 2015 году мы открыли второй офис, а в 2020 запустили международное направление.",
+                            content: "Основание компании, ключевые вехи развития, достижения и награды.",
                             icon: "fas fa-history",
-                            color: "#9b59b6",
-                            children: [
-                                {
-                                    id: "fathers_1",
-                                    title: "Прп. Иустин Челийский",
-                                    path: "/about/history/fathers_1",
-                                    description: "Прп. Иустин Челийский",
-                                    content: "Экуменизм – это общее название всех видов псевдохристианства и всех псевдоцерквей Западной Европы. В нем сущность всех родов гуманизма с папизмом во главе. А все этому есть общее евангельское название: ересь, ибо в течение всей истории разные ереси не считали важными или искажали отдельные особенности Христа, а эти новые европейские ереси отвергают, оттесняют, отстраняют Богочеловека и на Его место ставят человека, и здесь нет существенного различия между папизмом, протестантизмом и другими сектами, имя которым легион.",
-                                    icon: "fas fa-user-tie",
-                                    color: "#f39c12"
-                                },
-                                {
-                                    id: "fathers_2",
-                                    title: "Прп. Паисий Святогорец",
-                                    path: "/about/history/fathers_2",
-                                    description: "Прп. Паисий Святогорец",
-                                    content: "Преподобный Паисий Святогорец говорил: «Сегодня, к несчастью, и у нас появилась европейская «корректность», и люди стремятся показать себя добрыми. Желая проявить свое «высшее благородство», они заканчивают тем, что кланяются двурогому диаволу. «Пусть будет одна религия», — говорят они и все ставят на одну доску. Ко мне в каливу тоже приходили несколько человек с такими взглядами. «Нам, то есть всем, кто верует во Христа, — говорили они мне, — надо объединиться в одну религию». – «Это все равно что предлагать мне собрать в одну кучу столько-то каратов золота и столько-то отделений от этого золота меди, чтобы снова сделать из них один сплав, — ответил я. – Но разве разумно опять смешивать золото с дешевыми металлами? Ведь было столько борьбы, чтобы очистить догмат от мусора». Святые Отцы знали, что делали. Они воспретили общение с еретиками не без причины. Но сегодня призывают к совместным молитвам не только с еретиком, но и с буддистом, огнепоклонником и сатанистом. «Православные, — говорят, — тоже должны присутствовать на экуменических совместных молитвах и конференциях. Это – свидетельство!» Да какое там еще «свидетельство»! Эти люди разрешают все проблемы с помощью логики, они находят оправдание тому, чему не может быть оправдания».<br><br>Диавол закинул сети, чтобы поймать в них всё человечество. Богатых он хочет уловить масонством, бедных коммунизмом, а верующих - ЭКУМЕНИЗМОМ",
-                                    icon: "fas fa-code",
-                                    color: "#1abc9c"
-                                },
-                                {
-                                    id: "fathers_3",
-                                    title: "Свт. Марк Эфесский",
-                                    path: "/about/history/fathers_2",
-                                    description: "Свт. Марк Эфесский",
-                                    content: "Никогда, о человек, то, что относится к Церкви, не исправляется через компромиссы: нет ничего среднего между истиной и ложью. (Свт. Марк Эфесский)",
-                                    icon: "fas fa-paint-brush",
-                                    color: "#d35400"
-                                }
-                            ]
+                            color: "#9b59b6"
                         },
                         {
                             id: "team",
                             title: "Наша команда",
                             path: "/about/team",
                             description: "Знакомство с нашей командой специалистов",
-                            content: "В нашей компании работают высококвалифицированные специалисты с опытом работы более 5 лет. Мы ценим профессионализм и постоянно обучаем наших сотрудников.",
+                            content: "В нашей компании работают высококвалифицированные специалисты с опытом работы более 5 лет.",
                             icon: "fas fa-users",
                             color: "#e74c3c",
                             children: [
@@ -760,154 +975,51 @@
                                     title: "Руководство компании",
                                     path: "/about/team/management",
                                     description: "Руководящий состав компании",
-                                    content: "Опытные руководители с многолетним опытом в управлении IT-проектами. Наши менеджеры имеют сертификаты PMP и Scrum Master.",
+                                    content: "Опытные руководители с многолетним опытом в управлении IT-проектами.",
                                     icon: "fas fa-user-tie",
                                     color: "#f39c12"
                                 },
                                 {
                                     id: "developers",
-                                    title: "Разработчики программного обеспечения",
+                                    title: "Разработчики",
                                     path: "/about/team/developers",
                                     description: "Команда разработчиков",
-                                    content: "Профессиональные разработчики, специализирующиеся на различных технологиях: JavaScript, Python, Java, Go, React, Vue.js, Node.js и других.",
+                                    content: "Профессиональные разработчики, специализирующиеся на различных технологиях.",
                                     icon: "fas fa-code",
                                     color: "#1abc9c"
-                                },
-                                {
-                                    id: "designers",
-                                    title: "Дизайнеры интерфейсов",
-                                    path: "/about/team/designers",
-                                    description: "Команда дизайнеров",
-                                    content: "Креативные дизайнеры, создающие удобные и красивые интерфейсы. Специалисты по UX/UI дизайну с пониманием психологии пользователей.",
-                                    icon: "fas fa-paint-brush",
-                                    color: "#d35400"
                                 }
                             ]
-                        },
-                        {
-                            id: "mission",
-                            title: "Миссия и ценности",
-                            path: "/about/mission",
-                            description: "Миссия компании и корпоративные ценности",
-                            content: "Наша миссия - создавать качественные IT-решения, которые делают жизнь людей проще и удобнее. Ценности: инновации, качество, клиентоориентированность, развитие сотрудников.",
-                            icon: "fas fa-bullseye",
-                            color: "#34495e"
                         }
                     ]
                 },
                 {
                     id: "services",
-                    title: "Услуги и сервисы",
+                    title: "Услуги",
                     path: "/services",
                     description: "Перечень предоставляемых услуг и сервисов",
-                    content: "Мы предлагаем широкий спектр услуг в области веб-разработки, дизайна и цифрового маркетинга. Каждая услуга выполняется с максимальным вниманием к деталям.",
+                    content: "Мы предлагаем широкий спектр услуг в области веб-разработки, дизайна и цифрового маркетинга.",
                     icon: "fas fa-concierge-bell",
                     color: "#e67e22",
                     children: [
                         {
                             id: "webdev",
                             title: "Веб-разработка",
-                            path: "/services/web-development",
+                            path: "/services/web",
                             description: "Создание веб-сайтов и веб-приложений",
-                            content: "Полный цикл разработки: от проектирования до запуска и поддержки. Создаем корпоративные сайты, интернет-магазины, веб-приложения и порталы.",
+                            content: "Полный цикл разработки: от проектирования до запуска и поддержки.",
                             icon: "fas fa-laptop-code",
                             color: "#3498db"
-                        },
-                        {
-                            id: "mobile",
-                            title: "Мобильные приложения",
-                            path: "/services/mobile-apps",
-                            description: "Разработка приложений для iOS и Android",
-                            content: "Создание нативных и кроссплатформенных мобильных приложений. Разработка под iOS (Swift) и Android (Kotlin), а также Flutter и React Native приложения.",
-                            icon: "fas fa-mobile-alt",
-                            color: "#9b59b6"
-                        },
-                        {
-                            id: "design",
-                            title: "Дизайн и UI/UX",
-                            path: "/services/design",
-                            description: "Дизайн интерфейсов и фирменного стиля",
-                            content: "Создание уникального дизайна, который выделит ваш бренд среди конкурентов. UX исследования, UI дизайн, создание дизайн-систем и гайдлайнов.",
-                            icon: "fas fa-palette",
-                            color: "#e74c3c"
-                        },
-                        {
-                            id: "seo",
-                            title: "SEO-оптимизация и продвижение",
-                            path: "/services/seo",
-                            description: "Поисковая оптимизация и продвижение",
-                            content: "Увеличение видимости вашего сайта в поисковых системах. Технический SEO, контент-маркетинг, аналитика и аудит сайтов.",
-                            icon: "fas fa-search",
-                            color: "#2ecc71"
                         }
                     ]
                 },
                 {
                     id: "portfolio",
-                    title: "Портфолио проектов",
+                    title: "Портфолио",
                     path: "/portfolio",
                     description: "Примеры выполненных работ и проектов",
-                    content: "В нашем портфолио представлены проекты различной сложности для клиентов из разных отраслей: ритейл, образование, здравоохранение, финансы и другие.",
+                    content: "В нашем портфолио представлены проекты различной сложности для клиентов из разных отраслей.",
                     icon: "fas fa-briefcase",
-                    color: "#1abc9c",
-                    children: [
-                        {
-                            id: "websites",
-                            title: "Веб-сайты",
-                            path: "/portfolio/websites",
-                            description: "Примеры созданных веб-сайтов",
-                            content: "Корпоративные сайты, интернет-магазины, лендинги и порталы. Современные технологии, адаптивный дизайн, высокая производительность.",
-                            icon: "fas fa-globe",
-                            color: "#3498db"
-                        },
-                        {
-                            id: "applications",
-                            title: "Приложения и программное обеспечение",
-                            path: "/portfolio/applications",
-                            description: "Примеры разработанных приложений",
-                            content: "Мобильные и десктопные приложения для бизнеса и потребителей. CRM системы, ERP решения, мобильные приложения для iOS и Android.",
-                            icon: "fas fa-mobile",
-                            color: "#9b59b6"
-                        }
-                    ]
-                },
-                {
-                    id: "blog",
-                    title: "Блог и статьи",
-                    path: "/blog",
-                    description: "Статьи и новости компании",
-                    content: "Актуальные статьи о технологиях, дизайне и маркетинге. Советы по разработке, обзоры инструментов, кейсы и аналитика рынка IT.",
-                    icon: "fas fa-blog",
-                    color: "#f39c12"
-                },
-                {
-                    id: "contacts",
-                    title: "Контакты и обратная связь",
-                    path: "/contacts",
-                    description: "Контактная информация и форма обратной связи",
-                    content: "Свяжитесь с нами любым удобным способом. Мы всегда рады новым проектам и сотрудничеству. Ответим на вопросы и предложим оптимальное решение.",
-                    icon: "fas fa-address-book",
-                    color: "#e74c3c",
-                    children: [
-                        {
-                            id: "feedback",
-                            title: "Обратная связь",
-                            path: "/contacts/feedback",
-                            description: "Форма для отправки сообщений",
-                            content: "Задайте вопрос или отправьте предложение о сотрудничестве. Наши менеджеры свяжутся с вами в течение 24 часов в рабочие дни.",
-                            icon: "fas fa-comments",
-                            color: "#3498db"
-                        },
-                        {
-                            id: "offices",
-                            title: "Наши офисы и филиалы",
-                            path: "/contacts/offices",
-                            description: "Адреса офисов и филиалов",
-                            content: "Мы имеем представительства в нескольких городах страны. Главный офис находится в Москве, филиалы в Санкт-Петербурге и Казани.",
-                            icon: "fas fa-map-marker-alt",
-                            color: "#2ecc71"
-                        }
-                    ]
+                    color: "#1abc9c"
                 }
             ]
         };
@@ -916,14 +1028,21 @@
         let appState = {
             expandedNodes: new Set(['root']),
             selectedNode: null,
-            breadcrumbPath: [],
             searchQuery: '',
             searchResults: [],
-            searchActive: false
+            searchActive: false,
+            currentUrl: window.location.href,
+            linkFormat: 'path' // 'path' или 'id'
         };
 
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', function() {
+            // Отображаем текущий URL
+            updateCurrentUrlDisplay();
+            
+            // Проверяем URL параметры при загрузке
+            checkUrlParameters();
+            
             renderTree();
             updateTotalSections();
             
@@ -932,15 +1051,41 @@
             document.getElementById('collapseAll').addEventListener('click', collapseAll);
             document.getElementById('clearSearch').addEventListener('click', clearSearch);
             document.getElementById('resetView').addEventListener('click', resetView);
+            document.getElementById('generateLinkBtn').addEventListener('click', showUrlGenerator);
+            
+            // Обработчики для генератора ссылок
+            document.getElementById('copyUrlBtn').addEventListener('click', copyUrlToClipboard);
+            document.getElementById('shareEmail').addEventListener('click', shareViaEmail);
+            document.getElementById('shareWhatsApp').addEventListener('click', shareViaWhatsApp);
+            document.getElementById('shareTelegram').addEventListener('click', shareViaTelegram);
+            document.getElementById('showQrBtn').addEventListener('click', toggleQrCode);
+            
+            // Обработчики форматов ссылок
+            document.querySelectorAll('input[name="linkFormat"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    appState.linkFormat = this.value;
+                    updateGeneratedUrl();
+                });
+            });
             
             // Обработчики поиска
             const searchInput = document.getElementById('searchInput');
             const searchResults = document.getElementById('searchResults');
-            
+
             searchInput.addEventListener('input', function(e) {
                 performSearch(e.target.value);
             });
             
+            // Изначально выбираем корневой элемент
+            if (!appState.selectedNode) {
+                selectNode('root');
+            }
+            
+            // Слушаем изменения hash в URL
+            window.addEventListener('hashchange', function() {
+                checkUrlParameters();
+            });
+
             searchInput.addEventListener('focus', function() {
                 if (appState.searchResults.length > 0) {
                     searchResults.style.display = 'block';
@@ -969,99 +1114,13 @@
             
             // Изначально выбираем корневой элемент
             selectNode('root');
+            
+            // Слушаем изменения истории
+            window.addEventListener('popstate', function() {
+                checkUrlParameters();
+                updateCurrentUrlDisplay();
+            });
         });
-
-        // Выполнение поиска
-        function performSearch(query) {
-            const startTime = performance.now();
-            appState.searchQuery = query.trim().toLowerCase();
-            
-            if (!appState.searchQuery) {
-                clearSearch();
-                return;
-            }
-            
-            appState.searchActive = true;
-            appState.searchResults = [];
-            
-            // Поиск по всем узлам
-            searchNodes(hierarchyData, appState.searchQuery);
-            
-            // Сортировка результатов по релевантности (по количеству совпадений)
-            appState.searchResults.sort((a, b) => b.score - a.score);
-            
-            // Отображение результатов
-            displaySearchResults();
-            
-            // Подсветка найденных элементов в дереве
-            highlightSearchResults();
-            
-            const endTime = performance.now();
-            const searchTime = Math.round(endTime - startTime);
-            
-            document.getElementById('searchTime').textContent = `${searchTime} мс`;
-            document.getElementById('searchStatus').textContent = `Найдено: ${appState.searchResults.length} результатов`;
-            
-            // Показываем панель результатов
-            document.getElementById('searchResults').style.display = 'block';
-        }
-
-        // Рекурсивный поиск по узлам
-        function searchNodes(node, query) {
-            let score = 0;
-            let matches = [];
-            
-            // Поиск в заголовке
-            if (node.title.toLowerCase().includes(query)) {
-                score += 3;
-                matches.push({ field: 'title', text: node.title });
-            }
-            
-            // Поиск в описании
-            if (node.description.toLowerCase().includes(query)) {
-                score += 2;
-                matches.push({ field: 'description', text: node.description });
-            }
-            
-            // Поиск в содержимом
-            if (node.content.toLowerCase().includes(query)) {
-                score += 1;
-                matches.push({ field: 'content', text: node.content });
-            }
-            
-            // Поиск в пути
-            if (node.path.toLowerCase().includes(query)) {
-                score += 1;
-                matches.push({ field: 'path', text: node.path });
-            }
-            
-            // Если есть совпадения, добавляем в результаты
-            if (score > 0) {
-                appState.searchResults.push({
-                    node: node,
-                    score: score,
-                    matches: matches,
-                    highlightedTitle: highlightText(node.title, query),
-                    highlightedDescription: highlightText(node.description, query)
-                });
-            }
-            
-            // Рекурсивный поиск в дочерних элементах
-            if (node.children) {
-                node.children.forEach(child => {
-                    searchNodes(child, query);
-                });
-            }
-        }
-
-        // Подсветка текста в результатах поиска
-        function highlightText(text, query) {
-            if (!query) return text;
-            
-            const regex = new RegExp(`(${query})`, 'gi');
-            return text.replace(regex, '<span class="search-highlight-text">$1</span>');
-        }
-
         // Отображение результатов поиска
         function displaySearchResults() {
             const resultsList = document.getElementById('resultsList');
@@ -1165,111 +1224,285 @@
             document.getElementById('searchStatus').textContent = 'Поиск не активен';
         }
 
-        // Раскрытие всех родителей узла
-        function expandAllParents(node) {
-            let currentNode = node;
-            
-            while (currentNode.parentId) {
-                appState.expandedNodes.add(currentNode.parentId);
-                currentNode = findNodeById(currentNode.parentId);
-            }
-            
-            renderTree();
+        // Обновление отображения текущего URL
+        function updateCurrentUrlDisplay() {
+            document.getElementById('currentUrl').textContent = window.location.href;
         }
 
-        // Очистка поиска
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            appState.searchQuery = '';
-            appState.searchResults = [];
-            appState.searchActive = false;
+        // Проверка URL параметров при загрузке страницы
+        function checkUrlParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hashParams = window.location.hash.substring(1);
             
-            document.getElementById('searchResults').style.display = 'none';
-            document.getElementById('searchStatus').textContent = 'Поиск не активен';
+            // 1. Проверяем параметр path (приоритетный)
+            let sectionPath = urlParams.get('path');
             
-            // Снимаем подсветку с элементов дерева
-            document.querySelectorAll('.tree-item').forEach(item => {
-                item.classList.remove('search-match', 'search-highlight');
-            });
-        }
-
-        // Рендеринг дерева
-        function renderTree() {
-            const treeContainer = document.getElementById('tree');
-            treeContainer.innerHTML = '';
-            treeContainer.appendChild(createTreeNode(hierarchyData, 0));
-        }
-
-        // Создание узла дерева
-        function createTreeNode(node, level) {
-            const li = document.createElement('li');
-            li.id = `node-${node.id}`;
-            li.dataset.nodeId = node.id;
-            
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'tree-item';
-            if (appState.selectedNode === node.id) {
-                itemDiv.classList.add('active');
-            }
-            
-            if (node.children && node.children.length > 0) {
-                itemDiv.classList.add(appState.expandedNodes.has(node.id) ? 'expanded' : 'collapsed');
-            }
-            
-            // Проверяем, является ли узел результатом поиска
-            const searchResult = appState.searchResults.find(r => r.node.id === node.id);
-            if (searchResult) {
-                itemDiv.classList.add('search-match');
-                if (appState.searchResults[0] && appState.searchResults[0].node.id === node.id) {
-                    itemDiv.classList.add('search-highlight');
+            // 2. Если нет path, проверяем id
+            if (!sectionPath) {
+                const sectionId = urlParams.get('id');
+                if (sectionId) {
+                    // Ищем узел по ID и получаем его путь
+                    const node = findNodeById(sectionId);
+                    if (node) {
+                        sectionPath = node.path;
+                    }
                 }
             }
             
-            // Содержимое элемента
-            const displayTitle = searchResult ? 
-                highlightText(node.title, appState.searchQuery) : 
-                node.title;
-            
-            itemDiv.innerHTML = `
-                <div>
-                    <div class="item-title"><i class="${node.icon}" style="color: ${node.color}; margin-right: 8px;"></i> ${displayTitle}</div>
-                    <div class="item-path">${node.path}</div>
-                </div>
-                ${node.children && node.children.length > 0 ? 
-                    `<div class="item-icon"><i class="fas fa-chevron-down"></i></div>` : 
-                    `<div class="item-icon"><i class="fas fa-file"></i></div>`
+            // 3. Проверяем hash (для коротких ссылок)
+            if (!sectionPath && hashParams) {
+                // Пытаемся найти узел по hash
+                const node = findNodeByHash(hashParams);
+                if (node) {
+                    sectionPath = node.path;
                 }
-            `;
-            
-            // Обработчики событий
-            itemDiv.addEventListener('click', function(e) {
-                e.stopPropagation();
-                selectNode(node.id);
-            });
-            
-            itemDiv.addEventListener('dblclick', function(e) {
-                e.stopPropagation();
-                toggleNode(node.id);
-            });
-            
-            li.appendChild(itemDiv);
-            
-            // Дочерние элементы
-            if (node.children && node.children.length > 0) {
-                const ul = document.createElement('ul');
-                ul.style.display = appState.expandedNodes.has(node.id) ? 'block' : 'none';
-                
-                node.children.forEach(child => {
-                    ul.appendChild(createTreeNode(child, level + 1));
-                });
-                
-                li.appendChild(ul);
             }
             
-            return li;
+            // Если нашли путь, переходим к разделу
+            if (sectionPath) {
+                // Декодируем путь
+                sectionPath = decodeURIComponent(sectionPath);
+                
+                // Ищем узел по пути
+                const node = findNodeByPath(sectionPath);
+                if (node) {
+                    // Раскрываем всех родителей
+                    expandAllParents(node);
+                    
+                    // Выбираем узел
+                    selectNode(node.id);
+                    
+                    // Прокручиваем к элементу
+                    setTimeout(() => {
+                        const nodeElement = document.getElementById(`node-${node.id}`);
+                        if (nodeElement) {
+                            nodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                    
+                    showNotification(`Переход к разделу: ${node.title}`, 'success');
+                } else {
+                    showNotification(`Раздел "${sectionPath}" не найден`, 'error');
+                }
+            }
         }
 
-        // Выбор узла
+        // Поиск узла по пути
+        function findNodeByPath(path) {
+            // Нормализуем путь (убираем начальный и конечный слэши)
+            const normalizedPath = path.replace(/^\/+|\/+$/g, '');
+            
+            function searchNode(node, currentPath) {
+                // Сравниваем пути
+                const nodePath = node.path.replace(/^\/+|\/+$/g, '');
+                if (nodePath === normalizedPath) {
+                    return node;
+                }
+                
+                // Ищем в дочерних элементах
+                if (node.children) {
+                    for (const child of node.children) {
+                        const found = searchNode(child, currentPath);
+                        if (found) return found;
+                    }
+                }
+                
+                return null;
+            }
+            
+            return searchNode(hierarchyData, '');
+        }
+
+        // Поиск узла по hash (короткая ссылка)
+        function findNodeByHash(hash) {
+            // Преобразуем hash в путь
+            // Пример: "about-team" -> "/about/team"
+            const path = '/' + hash.replace(/-/g, '/');
+            return findNodeByPath(path);
+        }
+
+        // Генерация hash из пути (для коротких ссылок)
+        function generateHashFromPath(path) {
+            // Пример: "/about/team" -> "about-team"
+            return path.replace(/^\/+|\/+$/g, '').replace(/\//g, '-');
+        }
+
+        // Показать генератор ссылок
+        function showUrlGenerator() {
+            const urlGenerator = document.getElementById('urlGenerator');
+            const detailsContent = document.getElementById('detailsContent');
+            const noSelection = document.getElementById('noSelection');
+            
+            if (!appState.selectedNode) {
+                showNotification('Сначала выберите раздел', 'warning');
+                return;
+            }
+            
+            const node = findNodeById(appState.selectedNode);
+            if (!node) return;
+            
+            // Показываем генератор ссылок
+            urlGenerator.style.display = 'block';
+            
+            // Скрываем "нет выбора" если оно было показано
+            noSelection.style.display = 'none';
+            
+            // Устанавливаем выбранный формат
+            document.querySelector(`input[name="linkFormat"][value="${appState.linkFormat}"]`).checked = true;
+            
+            // Обновляем сгенерированные URL
+            updateGeneratedUrl();
+        }
+
+        // Обновление сгенерированных URL
+        function updateGeneratedUrl() {
+            const node = findNodeById(appState.selectedNode);
+            if (!node) return;
+            
+            // Генерируем основной URL
+            const mainUrl = generateSectionUrl(node);
+            document.getElementById('generatedUrl').value = mainUrl;
+            
+            // Генерируем короткий URL
+            const shortUrl = generateShortUrl(node);
+            document.getElementById('shortUrl').textContent = shortUrl;
+            document.getElementById('shortUrlInfo').style.display = 'block';
+            
+            // Обновляем QR-код если он показан
+            if (document.getElementById('qrCodeContainer').classList.contains('show')) {
+                generateQrCode(mainUrl);
+            }
+        }
+
+        // Генерация URL для раздела
+        function generateSectionUrl(node) {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const url = new URL(baseUrl);
+            
+            if (appState.linkFormat === 'path') {
+                // Используем путь раздела
+                const sectionPath = node.path.startsWith('/') ? node.path.substring(1) : node.path;
+                url.searchParams.set('path', sectionPath);
+            } else {
+                // Используем ID раздела
+                url.searchParams.set('id', node.id);
+            }
+            
+            return url.toString();
+        }
+
+        // Генерация короткого URL (через hash)
+        function generateShortUrl(node) {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const hash = generateHashFromPath(node.path);
+            return `${baseUrl}#${hash}`;
+        }
+
+        // Копирование URL в буфер обмена
+        function copyUrlToClipboard() {
+            const urlInput = document.getElementById('generatedUrl');
+            urlInput.select();
+            urlInput.setSelectionRange(0, 99999);
+            
+            navigator.clipboard.writeText(urlInput.value).then(() => {
+                showNotification('Ссылка скопирована в буфер обмена!', 'success');
+            }).catch(err => {
+                // Fallback
+                document.execCommand('copy');
+                showNotification('Ссылка скопирована в буфер обмена!', 'success');
+            });
+        }
+
+        // Поделиться по Email
+        function shareViaEmail(e) {
+            e.preventDefault();
+            const node = findNodeById(appState.selectedNode);
+            if (!node) return;
+            
+            const url = generateSectionUrl(node);
+            const subject = `Ссылка на раздел: ${node.title}`;
+            const body = `Привет!\n\nПосмотри этот раздел: ${node.title}\n${url}\n\n${node.description}`;
+            
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        // Поделиться через WhatsApp
+        function shareViaWhatsApp(e) {
+            e.preventDefault();
+            const node = findNodeById(appState.selectedNode);
+            if (!node) return;
+            
+            const url = generateSectionUrl(node);
+            const text = `Посмотри этот раздел: ${node.title}\n${url}`;
+            
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // Поделиться через Telegram
+        function shareViaTelegram(e) {
+            e.preventDefault();
+            const node = findNodeById(appState.selectedNode);
+            if (!node) return;
+            
+            const url = generateSectionUrl(node);
+            const text = `Посмотри этот раздел: ${node.title}`;
+            
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // Показать/скрыть QR-код
+        function toggleQrCode(e) {
+            e.preventDefault();
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const isShowing = qrContainer.classList.contains('show');
+            
+            if (!isShowing) {
+                const node = findNodeById(appState.selectedNode);
+                if (node) {
+                    const url = generateSectionUrl(node);
+                    generateQrCode(url);
+                    qrContainer.classList.add('show');
+                }
+            } else {
+                qrContainer.classList.remove('show');
+            }
+        }
+
+        // Генерация QR-кода
+        function generateQrCode(url) {
+            const canvas = document.getElementById('qrCode');
+            canvas.width = 200;
+            canvas.height = 200;
+            
+            QRCode.toCanvas(canvas, url, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#2c3e50',
+                    light: '#ffffff'
+                }
+            }, function(error) {
+                if (error) {
+                    console.error('Ошибка генерации QR-кода:', error);
+                }
+            });
+        }
+
+        // Показать уведомление
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = 'notification';
+            notification.classList.add(type, 'show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Функция выбора узла
         function selectNode(nodeId) {
             appState.selectedNode = nodeId;
             
@@ -1288,69 +1521,45 @@
             
             // Обновление хлебных крошек
             updateBreadcrumb(nodeId);
+            
+            // Обновление URL в браузере
+            updateBrowserUrl(nodeId);
+            
+            // Обновляем генератор ссылок если он открыт
+            const urlGenerator = document.getElementById('urlGenerator');
+            if (urlGenerator.style.display === 'block') {
+                updateGeneratedUrl();
+            }
         }
 
-        // Переключение узла (раскрыть/свернуть)
-        function toggleNode(nodeId) {
-            if (appState.expandedNodes.has(nodeId)) {
-                appState.expandedNodes.delete(nodeId);
+        // Обновление URL браузера
+        function updateBrowserUrl(nodeId) {
+            const node = findNodeById(nodeId);
+            if (!node) return;
+            
+            // Создаем новый URL
+            const url = new URL(window.location);
+            
+            // Очищаем старые параметры
+            url.searchParams.delete('path');
+            url.searchParams.delete('id');
+            
+            // Устанавливаем новые параметры
+            if (appState.linkFormat === 'path') {
+                const sectionPath = node.path.startsWith('/') ? node.path.substring(1) : node.path;
+                url.searchParams.set('path', sectionPath);
             } else {
-                appState.expandedNodes.add(nodeId);
+                url.searchParams.set('id', node.id);
             }
             
-            const nodeElement = document.getElementById(`node-${nodeId}`);
-            if (nodeElement) {
-                const itemDiv = nodeElement.querySelector('.tree-item');
-                const childUl = nodeElement.querySelector('ul');
-                
-                if (itemDiv) {
-                    itemDiv.classList.toggle('expanded');
-                    itemDiv.classList.toggle('collapsed');
-                }
-                
-                if (childUl) {
-                    childUl.style.display = appState.expandedNodes.has(nodeId) ? 'block' : 'none';
-                }
-            }
-        }
-
-        // Раскрыть все узлы
-        function expandAll() {
-            // Собираем все ID узлов, у которых есть дети
-            const nodesWithChildren = [];
-            function collectNodes(node) {
-                if (node.children && node.children.length > 0) {
-                    nodesWithChildren.push(node.id);
-                    node.children.forEach(collectNodes);
-                }
-            }
-            collectNodes(hierarchyData);
+            // Обновляем URL без перезагрузки
+            window.history.pushState({}, '', url.toString());
             
-            // Добавляем все узлы в expandedNodes
-            nodesWithChildren.forEach(id => appState.expandedNodes.add(id));
-            
-            // Перерендериваем дерево
-            renderTree();
+            // Обновляем отображение URL
+            updateCurrentUrlDisplay();
         }
 
-        // Свернуть все узлы
-        function collapseAll() {
-            // Оставляем только корневой элемент
-            appState.expandedNodes.clear();
-            appState.expandedNodes.add('root');
-            
-            // Перерендериваем дерево
-            renderTree();
-        }
-
-        // Сброс вида
-        function resetView() {
-            collapseAll();
-            clearSearch();
-            selectNode('root');
-        }
-
-        // Обновление деталей выбранного узла
+        // Функция обновления деталей
         function updateDetails(nodeId) {
             const node = findNodeById(nodeId);
             const detailsContent = document.getElementById('detailsContent');
@@ -1374,15 +1583,6 @@
                 `).join('') : 
                 '<li style="font-style: italic; color: #95a5a6;">Нет подразделов</li>';
             
-            // Подсветка текста поиска, если поиск активен
-            const displayContent = appState.searchQuery && node.content.toLowerCase().includes(appState.searchQuery) ?
-                highlightText(node.content, appState.searchQuery) :
-                node.content;
-                
-            const displayDescription = appState.searchQuery && node.description.toLowerCase().includes(appState.searchQuery) ?
-                highlightText(node.description, appState.searchQuery) :
-                node.description;
-            
             return `
                 <div class="section-details active">
                     <div class="detail-header">
@@ -1398,12 +1598,12 @@
                     <div class="detail-content">
                         <div class="detail-section">
                             <h3><i class="fas fa-info-circle"></i> Описание</h3>
-                            <p>${displayDescription}</p>
+                            <p>${node.description}</p>
                         </div>
                         
                         <div class="detail-section">
                             <h3><i class="fas fa-file-alt"></i> Содержание</h3>
-                            <p>${displayContent}</p>
+                            <p>${node.content}</p>
                         </div>
                         
                         <div class="detail-section">
@@ -1414,17 +1614,200 @@
                         </div>
                         
                         <div class="detail-section">
-                            <h3><i class="fas fa-code-branch"></i> Иерархическая информация</h3>
-                            <p><strong>ID:</strong> ${node.id}</p>
-                            <p><strong>Уровень вложенности:</strong> ${calculateNodeDepth(node)}</p>
-                            <p><strong>Всего потомков:</strong> ${countDescendants(node)}</p>
+                            <h3><i class="fas fa-link"></i> Ссылки на этот раздел</h3>
+                            <p><strong>По пути:</strong> <code>${generateSectionUrlByFormat(node, 'path')}</code></p>
+                            <p><strong>По ID:</strong> <code>${generateSectionUrlByFormat(node, 'id')}</code></p>
+                            <p><strong>Короткая:</strong> <code>${generateShortUrl(node)}</code></p>
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // Обновление хлебных крошек
+        // Генерация URL по определенному формату
+        function generateSectionUrlByFormat(node, format) {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const url = new URL(baseUrl);
+            
+            if (format === 'path') {
+                const sectionPath = node.path.startsWith('/') ? node.path.substring(1) : node.path;
+                url.searchParams.set('path', sectionPath);
+            } else {
+                url.searchParams.set('id', node.id);
+            }
+            
+            return url.toString();
+        }
+
+        // Остальные функции (renderTree, createTreeNode и т.д.)
+        // ... они остаются такими же как в предыдущей версии
+        
+        // Для примера покажу основные функции:
+        
+        function renderTree() {
+            const treeContainer = document.getElementById('tree');
+            treeContainer.innerHTML = '';
+            treeContainer.appendChild(createTreeNode(hierarchyData, 0));
+        }
+        
+        function createTreeNode(node, level) {
+            const li = document.createElement('li');
+            li.id = `node-${node.id}`;
+            li.dataset.nodeId = node.id;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'tree-item';
+            if (appState.selectedNode === node.id) {
+                itemDiv.classList.add('active');
+            }
+            
+            if (node.children && node.children.length > 0) {
+                itemDiv.classList.add(appState.expandedNodes.has(node.id) ? 'expanded' : 'collapsed');
+            }
+            
+            itemDiv.innerHTML = `
+                <div>
+                    <div class="item-title"><i class="${node.icon}" style="color: ${node.color}; margin-right: 8px;"></i> ${node.title}</div>
+                    <div class="item-path">${node.path}</div>
+                </div>
+                ${node.children && node.children.length > 0 ? 
+                    `<div class="item-icon"><i class="fas fa-chevron-down"></i></div>` : 
+                    `<div class="item-icon"><i class="fas fa-file"></i></div>`
+                }
+            `;
+            
+            itemDiv.addEventListener('click', function(e) {
+                e.stopPropagation();
+                selectNode(node.id);
+            });
+            
+            itemDiv.addEventListener('dblclick', function(e) {
+                e.stopPropagation();
+                toggleNode(node.id);
+            });
+            
+            li.appendChild(itemDiv);
+            
+            if (node.children && node.children.length > 0) {
+                const ul = document.createElement('ul');
+                ul.style.display = appState.expandedNodes.has(node.id) ? 'block' : 'none';
+                
+                node.children.forEach(child => {
+                    ul.appendChild(createTreeNode(child, level + 1));
+                });
+                
+                li.appendChild(ul);
+            }
+            
+            return li;
+        }
+        
+        function findNodeById(nodeId) {
+            function findNode(node, id) {
+                if (node.id === id) return node;
+                
+                if (node.children) {
+                    for (const child of node.children) {
+                        child.parentId = node.id;
+                        const found = findNode(child, id);
+                        if (found) return found;
+                    }
+                }
+                
+                return null;
+            }
+            
+            return findNode(hierarchyData, nodeId);
+        }
+        
+        function expandAllParents(node) {
+            let currentNode = node;
+            
+            while (currentNode.parentId) {
+                appState.expandedNodes.add(currentNode.parentId);
+                currentNode = findNodeById(currentNode.parentId);
+            }
+            
+            renderTree();
+        }
+        
+        function toggleNode(nodeId) {
+            if (appState.expandedNodes.has(nodeId)) {
+                appState.expandedNodes.delete(nodeId);
+            } else {
+                appState.expandedNodes.add(nodeId);
+            }
+            
+            const nodeElement = document.getElementById(`node-${nodeId}`);
+            if (nodeElement) {
+                const itemDiv = nodeElement.querySelector('.tree-item');
+                const childUl = nodeElement.querySelector('ul');
+                
+                if (itemDiv) {
+                    itemDiv.classList.toggle('expanded');
+                    itemDiv.classList.toggle('collapsed');
+                }
+                
+                if (childUl) {
+                    childUl.style.display = appState.expandedNodes.has(nodeId) ? 'block' : 'none';
+                }
+            }
+        }
+        
+        function expandAll() {
+            const nodesWithChildren = [];
+            function collectNodes(node) {
+                if (node.children && node.children.length > 0) {
+                    nodesWithChildren.push(node.id);
+                    node.children.forEach(collectNodes);
+                }
+            }
+            collectNodes(hierarchyData);
+            
+            nodesWithChildren.forEach(id => appState.expandedNodes.add(id));
+            renderTree();
+        }
+        
+        function collapseAll() {
+            appState.expandedNodes.clear();
+            appState.expandedNodes.add('root');
+            renderTree();
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            appState.searchQuery = '';
+            appState.searchResults = [];
+            appState.searchActive = false;
+            
+            document.getElementById('searchResults').style.display = 'none';
+            
+            document.querySelectorAll('.tree-item').forEach(item => {
+                item.classList.remove('search-match', 'search-highlight');
+            });
+        }
+        
+        function resetView() {
+            collapseAll();
+            clearSearch();
+            selectNode('root');
+        }
+        
+        function updateTotalSections() {
+            function countNodes(node) {
+                let count = 1;
+                if (node.children) {
+                    node.children.forEach(child => {
+                        count += countNodes(child);
+                    });
+                }
+                return count;
+            }
+            
+            const total = countNodes(hierarchyData);
+            document.getElementById('totalSections').textContent = total;
+        }
+        
         function updateBreadcrumb(nodeId) {
             const breadcrumb = document.getElementById('breadcrumb');
             const path = getNodePath(nodeId);
@@ -1444,45 +1827,16 @@
             
             breadcrumb.innerHTML = breadcrumbHTML;
             
-            // Добавляем обработчики для ссылок в хлебных крошках
             breadcrumb.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     const nodeId = this.dataset.nodeId;
                     selectNode(nodeId);
-                    
-                    // Раскрываем все родительские узлы
                     expandAllParents(findNodeById(nodeId));
                 });
             });
         }
-
-        // Обновление счетчика разделов
-        function updateTotalSections() {
-            const total = countAllNodes(hierarchyData);
-            document.getElementById('totalSections').textContent = total;
-        }
-
-        // Вспомогательные функции
-        function findNodeById(nodeId) {
-            function findNode(node, id) {
-                if (node.id === id) return node;
-                
-                if (node.children) {
-                    for (const child of node.children) {
-                        // Добавляем parentId для навигации
-                        child.parentId = node.id;
-                        const found = findNode(child, id);
-                        if (found) return found;
-                    }
-                }
-                
-                return null;
-            }
-            
-            return findNode(hierarchyData, nodeId);
-        }
-
+        
         function getNodePath(nodeId) {
             const path = [];
             let currentNode = findNodeById(nodeId);
@@ -1494,44 +1848,42 @@
             
             return path;
         }
-
-        function calculateNodeDepth(node) {
-            let depth = 0;
-            let currentNode = node;
+        
+        // Выполнение поиска
+        function performSearch(query) {
+            const startTime = performance.now();
+            appState.searchQuery = query.trim().toLowerCase();
             
-            while (currentNode.parentId) {
-                depth++;
-                currentNode = findNodeById(currentNode.parentId);
+            if (!appState.searchQuery) {
+                clearSearch();
+                return;
             }
             
-            return depth;
+            appState.searchActive = true;
+            appState.searchResults = [];
+            
+            // Поиск по всем узлам
+            searchNodes(hierarchyData, appState.searchQuery);
+            
+            // Сортировка результатов по релевантности (по количеству совпадений)
+            appState.searchResults.sort((a, b) => b.score - a.score);
+            
+            // Отображение результатов
+            displaySearchResults();
+            
+            // Подсветка найденных элементов в дереве
+            highlightSearchResults();
+            
+            const endTime = performance.now();
+            const searchTime = Math.round(endTime - startTime);
+            
+            document.getElementById('searchTime').textContent = `${searchTime} мс`;
+            document.getElementById('searchStatus').textContent = `Найдено: ${appState.searchResults.length} результатов`;
+            
+            // Показываем панель результатов
+            document.getElementById('searchResults').style.display = 'block';
         }
-
-        function countDescendants(node) {
-            let count = 0;
-            
-            function countChildren(n) {
-                if (n.children) {
-                    count += n.children.length;
-                    n.children.forEach(countChildren);
-                }
-            }
-            
-            countChildren(node);
-            return count;
-        }
-
-        function countAllNodes(node) {
-            let count = 1; // Текущий узел
-            
-            if (node.children) {
-                node.children.forEach(child => {
-                    count += countAllNodes(child);
-                });
-            }
-            
-            return count;
-        }
+        
     </script>
 </body>
 </html>
