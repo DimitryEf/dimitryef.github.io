@@ -925,7 +925,9 @@
 
         <div class="footer">
             <p>Иерархия разделов сайта с внешними ссылками &copy; 2023</p>
-            <p>Текущий URL: <span id="currentUrl" style="font-family: monospace; color: #3498db; font-size: 0.9rem;"></span></p>
+            <p>Текущий URL: <span id="currentUrl" style="font-family: monospace; color: #3498db; font-size: 0.9rem;"></span>
+                <span id="totalSections">0</span>
+                <span id="searchStatus">Поиск не активен</span></p>
         </div>
     </div>
 
@@ -1582,7 +1584,14 @@
                     </li>
                 `).join('') : 
                 '<li style="font-style: italic; color: #95a5a6;">Нет подразделов</li>';
-            
+            // Подсветка текста поиска, если поиск активен
+            const displayContent = appState.searchQuery && node.content.toLowerCase().includes(appState.searchQuery) ?
+                highlightText(node.content, appState.searchQuery) :
+                node.content;
+                
+            const displayDescription = appState.searchQuery && node.description.toLowerCase().includes(appState.searchQuery) ?
+                highlightText(node.description, appState.searchQuery) :
+                node.description;
             return `
                 <div class="section-details active">
                     <div class="detail-header">
@@ -1650,6 +1659,7 @@
             treeContainer.appendChild(createTreeNode(hierarchyData, 0));
         }
         
+        // Создание узла дерева
         function createTreeNode(node, level) {
             const li = document.createElement('li');
             li.id = `node-${node.id}`;
@@ -1665,6 +1675,20 @@
                 itemDiv.classList.add(appState.expandedNodes.has(node.id) ? 'expanded' : 'collapsed');
             }
             
+            // Проверяем, является ли узел результатом поиска
+            const searchResult = appState.searchResults.find(r => r.node.id === node.id);
+            if (searchResult) {
+                itemDiv.classList.add('search-match');
+                if (appState.searchResults[0] && appState.searchResults[0].node.id === node.id) {
+                    itemDiv.classList.add('search-highlight');
+                }
+            }
+            
+            // Содержимое элемента
+            const displayTitle = searchResult ? 
+                highlightText(node.title, appState.searchQuery) : 
+                node.title;
+            
             itemDiv.innerHTML = `
                 <div>
                     <div class="item-title"><i class="${node.icon}" style="color: ${node.color}; margin-right: 8px;"></i> ${node.title}</div>
@@ -1676,6 +1700,7 @@
                 }
             `;
             
+            // Обработчики событий
             itemDiv.addEventListener('click', function(e) {
                 e.stopPropagation();
                 selectNode(node.id);
@@ -1688,6 +1713,7 @@
             
             li.appendChild(itemDiv);
             
+            // Дочерние элементы
             if (node.children && node.children.length > 0) {
                 const ul = document.createElement('ul');
                 ul.style.display = appState.expandedNodes.has(node.id) ? 'block' : 'none';
@@ -1781,6 +1807,7 @@
             appState.searchActive = false;
             
             document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('searchStatus').textContent = 'Поиск не активен';
             
             document.querySelectorAll('.tree-item').forEach(item => {
                 item.classList.remove('search-match', 'search-highlight');
@@ -1882,6 +1909,62 @@
             
             // Показываем панель результатов
             document.getElementById('searchResults').style.display = 'block';
+        }
+
+        // Рекурсивный поиск по узлам
+        function searchNodes(node, query) {
+            let score = 0;
+            let matches = [];
+            
+            // Поиск в заголовке
+            if (node.title.toLowerCase().includes(query)) {
+                score += 3;
+                matches.push({ field: 'title', text: node.title });
+            }
+            
+            // Поиск в описании
+            if (node.description.toLowerCase().includes(query)) {
+                score += 2;
+                matches.push({ field: 'description', text: node.description });
+            }
+            
+            // Поиск в содержимом
+            if (node.content.toLowerCase().includes(query)) {
+                score += 1;
+                matches.push({ field: 'content', text: node.content });
+            }
+            
+            // Поиск в пути
+            if (node.path.toLowerCase().includes(query)) {
+                score += 1;
+                matches.push({ field: 'path', text: node.path });
+            }
+            
+            // Если есть совпадения, добавляем в результаты
+            if (score > 0) {
+                appState.searchResults.push({
+                    node: node,
+                    score: score,
+                    matches: matches,
+                    highlightedTitle: highlightText(node.title, query),
+                    highlightedDescription: highlightText(node.description, query)
+                });
+            }
+            
+            // Рекурсивный поиск в дочерних элементах
+            if (node.children) {
+                node.children.forEach(child => {
+                    searchNodes(child, query);
+                });
+            }
+        }
+
+        // Подсветка текста в результатах поиска
+        function highlightText(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight-text">$1</span>');
         }
         
     </script>
